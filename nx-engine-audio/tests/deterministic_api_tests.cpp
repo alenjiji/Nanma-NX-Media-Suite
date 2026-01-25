@@ -1,3 +1,6 @@
+// 🔒 ARCHITECTURAL DETERMINISM TEST
+// Phase 1 invariant — MUST NOT be weakened.
+// Modifications require architectural review.
 #include <nx/audio/AudioEngine.h>
 #include <cassert>
 #include <iostream>

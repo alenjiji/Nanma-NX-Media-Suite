@@ -1,3 +1,6 @@
+// 🔒 ARCHITECTURAL DETERMINISM TEST
+// Phase 1 invariant — MUST NOT be weakened.
+// Modifications require architectural review.
 #include <nx/convert/TranscodeEngine.h>
 #include <cassert>
 #include <iostream>
