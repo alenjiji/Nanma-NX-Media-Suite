@@ -31,6 +31,7 @@ target_sources(nx-core
         src/logical_clock.cpp
         src/error_system.cpp
         src/result.cpp
+        src/api_contract.cpp
 )
 
 # Compiler-specific settings

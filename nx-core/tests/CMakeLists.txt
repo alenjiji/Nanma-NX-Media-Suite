@@ -26,8 +26,13 @@ target_link_libraries(test_error_system nx-core)
 add_executable(test_result test_result.cpp)
 target_link_libraries(test_result nx-core)
 
+# API contract tests
+add_executable(test_api_contract test_api_contract.cpp)
+target_link_libraries(test_api_contract nx-core)
+
 # Register tests with CTest
 add_test(NAME identity_tests COMMAND test_nx_identity)
 add_test(NAME logical_clock_tests COMMAND test_logical_clock)
 add_test(NAME error_system_tests COMMAND test_error_system)
 add_test(NAME result_tests COMMAND test_result)
+add_test(NAME api_contract_tests COMMAND test_api_contract)
