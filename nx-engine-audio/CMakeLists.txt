@@ -32,10 +32,19 @@ if(BUILD_TESTS)
         tests/AudioEngine_determinism_tests.cpp
     )
     
+    add_executable(deterministic_api_tests
+        tests/deterministic_api_tests.cpp
+    )
+    
     target_link_libraries(test_audio_determinism
+        PRIVATE nx-engine-audio
+    )
+    
+    target_link_libraries(deterministic_api_tests
         PRIVATE nx-engine-audio
     )
     
     enable_testing()
     add_test(NAME audio_determinism_test COMMAND test_audio_determinism)
+    add_test(NAME deterministic_api_test COMMAND deterministic_api_tests)
 endif()

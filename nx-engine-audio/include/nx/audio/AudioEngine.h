@@ -9,7 +9,7 @@ namespace nx::audio {
 /**
  * NX-AudioLab Core Engine
  * 
- * PHASE 1.A — ENGINE SKELETON (NO LOGIC)
+ * PHASE 1.A — DETERMINISTIC API DEFINITION
  * 
  * Pure coordinator for sample-accurate audio processing operations.
  * Enforces deterministic execution and explicit processing graphs.
@@ -23,11 +23,11 @@ namespace nx::audio {
  * - Uses LogicalClock only (no wall-clock time)
  * 
  * Forbidden:
- * - Audio format I/O operations
+ * - std::string paths or filesystem identifiers
+ * - Static or global state
+ * - Side effects
+ * - Audio I/O operations
  * - DSP algorithm implementations
- * - Codec processing
- * - Sample rate conversion logic
- * - Loudness processing logic
  * - System time dependencies
  */
 class AudioEngine final {
