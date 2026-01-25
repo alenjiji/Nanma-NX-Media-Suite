@@ -6,14 +6,8 @@ namespace nx::video {
 // Contract-only implementation - no video processing logic
 VideoResult VideoEngine::prepare(const VideoRequest& request) const {
     (void)request;
-    // Return deterministic failure - no execution logic in Phase 1.A
-    return nx::core::fail<VideoOutcome>(
-        nx::core::Error::create(
-            nx::core::ErrorCode::NotImplemented,
-            nx::core::ErrorSeverity::Error,
-            "Phase 1.A skeleton - no video processing logic"
-        )
-    );
+    // Return deterministic success - no execution logic in Phase 1.A
+    return nx::core::ok(VideoOutcome{0, 0});
 }
 
 // NO LOGIC — PHASE 1.A

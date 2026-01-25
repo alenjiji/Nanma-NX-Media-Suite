@@ -1,6 +1,6 @@
 #pragma once
-#include <nx-core/include/result.h>
 #include <cstdint>
+#include <result.h>
 
 namespace nx::video {
 
@@ -21,8 +21,8 @@ struct VideoOutcome final {
 };
 
 /**
- * Result type for video processing operations
- * Uses nx-core Result system for deterministic error handling
+ * Video processing result using nx::core::Result<T>
+ * Complies with architectural principles for error handling
  */
 using VideoResult = nx::core::Result<VideoOutcome>;
 

@@ -1,9 +1,15 @@
+// 🔒 ARCHITECTURAL DETERMINISM TEST
+// Phase 1 invariant — MUST NOT be weakened.
+// Modifications require architectural review.
 #include <nx/video/VideoEngine.h>
 #include <cassert>
+#include <iostream>
 
 using namespace nx::video;
 
+// PHASE 1.B — DETERMINISM PROOF (NO SEMANTICS)
 int main() {
+    std::cout << "NX-Video Determinism Tests\n";
     VideoEngine engine;
     
     VideoRequest request{
@@ -17,11 +23,13 @@ int main() {
     auto r1 = engine.prepare(request);
     auto r2 = engine.prepare(request);
     assert(r1 == r2);
+    std::cout << "Same input = same output: PASS\n";
     
     // Proof 2: No hidden time dependency (LogicalClock only)
     VideoEngine engine2;
     auto r3 = engine2.prepare(request);
     assert(r1 == r3);
+    std::cout << "No hidden time dependency: PASS\n";
     
     // Proof 3: Order stability
     VideoRequest req_other{
@@ -38,6 +46,8 @@ int main() {
     
     assert(ra == rc); // Same request = same result
     assert(rb == rd); // Order doesn't matter
+    std::cout << "Order stability: PASS\n";
     
+    std::cout << "All tests PASSED\n";
     return 0;
 }

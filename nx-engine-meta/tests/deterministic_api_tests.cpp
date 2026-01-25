@@ -1,28 +1,28 @@
 // 🔒 ARCHITECTURAL DETERMINISM TEST
 // Phase 1 invariant — MUST NOT be weakened.
 // Modifications require architectural review.
-#include <nx/video/VideoEngine.h>
+#include <nx/meta/MetaEngine.h>
 #include <cassert>
 #include <iostream>
 
-using namespace nx::video;
+using namespace nx::meta;
 
 // PHASE 1.B — DETERMINISM PROOF (NO SEMANTICS)
 void identical_requests_produce_identical_results() {
     std::cout << "Testing identical requests...";
-    VideoEngine engine;
+    MetaEngine engine;
 
-    VideoRequest a{
+    MetaRepairRequest a{
         nx::core::LogicalClock{1},
         42,
-        100,
-        200
+        ContainerId{100},
+        RepairGraphId{200}
     };
 
-    VideoRequest b = a;
+    MetaRepairRequest b = a;
 
-    auto r1 = engine.prepare(a);
-    auto r2 = engine.prepare(b);
+    auto r1 = engine.plan_repair(a);
+    auto r2 = engine.plan_repair(b);
 
     // Prove deterministic behavior - identical inputs = identical outputs
     assert(r1 == r2);
@@ -31,19 +31,19 @@ void identical_requests_produce_identical_results() {
 
 void engine_has_no_side_effects() {
     std::cout << "Testing no side effects...";
-    VideoEngine engine;
+    MetaEngine engine;
 
-    VideoRequest request{
+    MetaRepairRequest request{
         nx::core::LogicalClock{1},
         42,
-        100,
-        200
+        ContainerId{100},
+        RepairGraphId{200}
     };
 
     // Multiple calls should produce identical results (no side effects)
-    auto r1 = engine.prepare(request);
-    auto r2 = engine.prepare(request);
-    auto r3 = engine.prepare(request);
+    auto r1 = engine.plan_repair(request);
+    auto r2 = engine.plan_repair(request);
+    auto r3 = engine.plan_repair(request);
 
     assert(r1 == r2);
     assert(r2 == r3);
@@ -52,26 +52,26 @@ void engine_has_no_side_effects() {
 
 void different_logical_clocks_produce_deterministic_results() {
     std::cout << "Testing different logical clocks...";
-    VideoEngine engine;
+    MetaEngine engine;
 
-    VideoRequest a{
+    MetaRepairRequest a{
         nx::core::LogicalClock{1},
         42,
-        100,
-        200
+        ContainerId{100},
+        RepairGraphId{200}
     };
 
-    VideoRequest b{
+    MetaRepairRequest b{
         nx::core::LogicalClock{2},
         42,
-        100,
-        200
+        ContainerId{100},
+        RepairGraphId{200}
     };
 
-    auto r1 = engine.prepare(a);
-    auto r2 = engine.prepare(b);
-    auto r3 = engine.prepare(a);
-    auto r4 = engine.prepare(b);
+    auto r1 = engine.plan_repair(a);
+    auto r2 = engine.plan_repair(b);
+    auto r3 = engine.plan_repair(a);
+    auto r4 = engine.plan_repair(b);
 
     // Same inputs produce same outputs (determinism)
     assert(r1 == r3);
@@ -81,18 +81,18 @@ void different_logical_clocks_produce_deterministic_results() {
 
 void value_type_equality() {
     std::cout << "Testing value type equality...";
-    VideoRequest req1{
+    MetaRepairRequest req1{
         nx::core::LogicalClock{5},
         123,
-        456,
-        789
+        ContainerId{456},
+        RepairGraphId{789}
     };
 
-    VideoRequest req2{
+    MetaRepairRequest req2{
         nx::core::LogicalClock{5},
         123,
-        456,
-        789
+        ContainerId{456},
+        RepairGraphId{789}
     };
 
     // Value types with same values are equal
@@ -102,7 +102,7 @@ void value_type_equality() {
 }
 
 int main() {
-    std::cout << "NX-Video Deterministic API Tests\n";
+    std::cout << "NX-Meta Deterministic API Tests\n";
     identical_requests_produce_identical_results();
     engine_has_no_side_effects();
     different_logical_clocks_produce_deterministic_results();

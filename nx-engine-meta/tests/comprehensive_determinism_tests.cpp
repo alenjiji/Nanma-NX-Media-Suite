@@ -7,13 +7,9 @@
 
 using namespace nx::meta;
 
-// NO LOGIC — PHASE 1.A
-// Deterministic unit tests that compile
-// Media essence is read-only by default
-// Deterministic by construction
-
+// PHASE 1.B — DETERMINISM PROOF (NO SEMANTICS)
 int main() {
-    std::cout << "NX-Meta Determinism Tests\n";
+    std::cout << "NX-Meta Comprehensive Determinism Tests\n";
     MetaEngine engine;
     
     MetaRepairRequest request{
@@ -29,11 +25,11 @@ int main() {
     assert(r1 == r2);
     std::cout << "Same input = same output: PASS\n";
     
-    // Proof 2: No hidden time dependency (LogicalClock only)
+    // Proof 2: Cross-instance determinism
     MetaEngine engine2;
     auto r3 = engine2.plan_repair(request);
     assert(r1 == r3);
-    std::cout << "No hidden time dependency: PASS\n";
+    std::cout << "Cross-instance determinism: PASS\n";
     
     // Proof 3: Order stability
     MetaRepairRequest req_other{
@@ -52,6 +48,33 @@ int main() {
     assert(rb == rd); // Order doesn't matter
     std::cout << "Order stability: PASS\n";
     
-    std::cout << "All tests PASSED\n";
+    // Proof 4: Replayability
+    for (int i = 0; i < 5; ++i) {
+        auto replay = engine.plan_repair(request);
+        assert(replay == r1);
+    }
+    std::cout << "Replayability: PASS\n";
+    
+    // Proof 5: LogicalClock determinism
+    MetaRepairRequest clock_test1{
+        nx::core::LogicalClock{10},
+        100,
+        ContainerId{500},
+        RepairGraphId{600}
+    };
+    
+    MetaRepairRequest clock_test2{
+        nx::core::LogicalClock{10},
+        100,
+        ContainerId{500},
+        RepairGraphId{600}
+    };
+    
+    auto clock_r1 = engine.plan_repair(clock_test1);
+    auto clock_r2 = engine.plan_repair(clock_test2);
+    assert(clock_r1 == clock_r2);
+    std::cout << "LogicalClock determinism: PASS\n";
+    
+    std::cout << "All comprehensive tests PASSED\n";
     return 0;
 }

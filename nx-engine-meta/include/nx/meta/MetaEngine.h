@@ -1,3 +1,6 @@
+// 🔒 PHASE 1 API FREEZE
+// This public API is frozen as of Phase 1 completion.
+// Changes require explicit architectural review.
 #pragma once
 #include "MetaRepairRequest.h"
 #include "MetaRepairResult.h"
