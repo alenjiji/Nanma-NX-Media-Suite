@@ -36,6 +36,14 @@ if(BUILD_TESTS)
         tests/deterministic_api_tests.cpp
     )
     
+    add_executable(minimal_determinism_proof
+        tests/minimal_determinism_proof.cpp
+    )
+    
+    add_executable(comprehensive_determinism_proof
+        tests/comprehensive_determinism_proof.cpp
+    )
+    
     target_link_libraries(test_audio_determinism
         PRIVATE nx-engine-audio
     )
@@ -44,7 +52,17 @@ if(BUILD_TESTS)
         PRIVATE nx-engine-audio
     )
     
+    target_link_libraries(minimal_determinism_proof
+        PRIVATE nx-engine-audio
+    )
+    
+    target_link_libraries(comprehensive_determinism_proof
+        PRIVATE nx-engine-audio
+    )
+    
     enable_testing()
     add_test(NAME audio_determinism_test COMMAND test_audio_determinism)
     add_test(NAME deterministic_api_test COMMAND deterministic_api_tests)
+    add_test(NAME minimal_determinism_test COMMAND minimal_determinism_proof)
+    add_test(NAME comprehensive_determinism_test COMMAND comprehensive_determinism_proof)
 endif()
