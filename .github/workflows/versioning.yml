@@ -61,7 +61,7 @@ jobs:
 
   create-tag:
     name: Create Release Tag
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: version-check
     if: |
       github.event_name == 'push' && 
@@ -108,7 +108,7 @@ jobs:
 
   phase-boundary-check:
     name: Phase Boundary Protection
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: github.event_name == 'push'
     
     steps:
