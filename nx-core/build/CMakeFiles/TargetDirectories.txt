@@ -1,0 +1,6 @@
+D:/nanma_nx_media_suite/nx-core/build/CMakeFiles/nx-core.dir
+D:/nanma_nx_media_suite/nx-core/build/CMakeFiles/RUN_TESTS.dir
+D:/nanma_nx_media_suite/nx-core/build/CMakeFiles/ALL_BUILD.dir
+D:/nanma_nx_media_suite/nx-core/build/CMakeFiles/ZERO_CHECK.dir
+D:/nanma_nx_media_suite/nx-core/build/tests/CMakeFiles/test_identity.dir
+D:/nanma_nx_media_suite/nx-core/build/tests/CMakeFiles/RUN_TESTS.dir

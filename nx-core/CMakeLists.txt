@@ -1,3 +1,10 @@
+# NOTE:
+# NX-Core must never link against:
+# - Qt
+# - Engine modules
+# - UI libraries
+# Violations invalidate architectural guarantees.
+
 cmake_minimum_required(VERSION 3.20)
 project(nx-core VERSION 1.0.0 LANGUAGES CXX)
 
@@ -20,6 +27,7 @@ target_include_directories(nx-core
 target_sources(nx-core
     PRIVATE
         src/nx_core.cpp
+        src/nx_identity.cpp
 )
 
 # Compiler-specific settings

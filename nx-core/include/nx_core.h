@@ -6,9 +6,11 @@
 // This header defines the core namespace and foundational primitives
 // for all NX components. It is strictly media-agnostic.
 
+#include "nx_identity.h"
+
 namespace nx::core {
 
 // Core namespace for foundational primitives
-// No implementation at this phase - structure only
+// Identity system implemented in Phase 0, Unit 0.1
 
 } // namespace nx::core

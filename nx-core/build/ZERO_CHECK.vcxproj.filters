@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\nanma_nx_media_suite\nx-core\build\CMakeFiles\eb07e27997d671562c2827ff4e7efd42\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{B6E5F67D-9D20-39CB-871C-40E2F27EF50D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
