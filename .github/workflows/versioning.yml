@@ -13,7 +13,7 @@ permissions:
 jobs:
   version-check:
     name: Version Check
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       current-version: ${{ steps.version.outputs.current }}
       next-version: ${{ steps.version.outputs.next }}
