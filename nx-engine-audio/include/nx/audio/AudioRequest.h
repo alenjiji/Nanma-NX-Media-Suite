@@ -1,5 +1,5 @@
 #pragma once
-#include <nx-core/include/logical_clock.h>
+#include <logical_clock.h>
 #include <cstdint>
 
 namespace nx::audio {

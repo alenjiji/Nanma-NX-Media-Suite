@@ -28,14 +28,14 @@ target_link_libraries(nx-engine-video
 # Tests (optional)
 option(BUILD_TESTS "Build tests" OFF)
 if(BUILD_TESTS)
-    add_executable(test_video_determinism
-        tests/VideoEngine_determinism_tests.cpp
+    add_executable(test_video_skeleton
+        tests/VideoEngine_skeleton_tests.cpp
     )
     
-    target_link_libraries(test_video_determinism
+    target_link_libraries(test_video_skeleton
         PRIVATE nx-engine-video
     )
     
     enable_testing()
-    add_test(NAME video_determinism_test COMMAND test_video_determinism)
+    add_test(NAME video_skeleton_test COMMAND test_video_skeleton)
 endif()

@@ -1,5 +1,4 @@
 #pragma once
-#include <nx-core/include/result.h>
 #include <cstdint>
 
 namespace nx::convert {
@@ -21,9 +20,16 @@ struct TranscodeOutcome final {
 };
 
 /**
- * Result type for transcode operations
- * Uses nx-core Result system for deterministic error handling
+ * Placeholder Result type for Phase 1.A compile-only skeleton
+ * Will be replaced with proper nx-core Result system in later phases
  */
-using TranscodeResult = nx::core::Result<TranscodeOutcome>;
+struct TranscodeResult final {
+    bool success;
+    TranscodeOutcome outcome;
+    
+    constexpr bool operator==(const TranscodeResult&) const = default;
+    constexpr bool is_success() const { return success; }
+    constexpr bool is_failure() const { return !success; }
+};
 
 }

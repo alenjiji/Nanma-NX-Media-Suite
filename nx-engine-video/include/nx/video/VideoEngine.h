@@ -1,7 +1,6 @@
 #pragma once
-#include "VideoRequest.h"
-#include "VideoResult.h"
-#include "VideoGraph.h"
+#include "VideoProcessRequest.h"
+#include "VideoProcessResult.h"
 #include "Errors.h"
 
 namespace nx::video {
@@ -11,8 +10,8 @@ namespace nx::video {
  * 
  * PHASE 1.A — ENGINE SKELETON (NO LOGIC)
  * 
- * Pure coordinator for color-safe, deterministic video processing operations.
- * Enforces deterministic execution and explicit processing graphs.
+ * Pure coordinator for deterministic video pipeline construction.
+ * Enforces deterministic execution and explicit pipeline definition.
  * 
  * Deterministic API Contract:
  * - All methods are deterministic (same input = same output)
@@ -23,11 +22,10 @@ namespace nx::video {
  * - Uses LogicalClock only (no wall-clock time)
  * 
  * Forbidden:
- * - Video format I/O operations
- * - Codec implementations
- * - Color space processing
- * - Scaling operations
- * - Encoder implementations
+ * - Video encoding/decoding logic
+ * - Color processing logic
+ * - Frame processing
+ * - Pipeline execution
  * - System time dependencies
  */
 class VideoEngine final {
@@ -35,30 +33,17 @@ public:
     explicit VideoEngine() = default;
 
     /**
-     * Prepare video processing operation - deterministic, no side effects
+     * Construct video pipeline - deterministic, no side effects
      * 
      * Contract:
      * - Deterministic: same request = same result
      * - No side effects: does not modify any state
      * - All state via parameters: no hidden dependencies
      * 
-     * @param request Complete video processing parameters (value type)
-     * @return Result containing outcome or explicit error
+     * @param request Video pipeline construction parameters (value type)
+     * @return Result containing pipeline outcome or explicit error
      */
-    VideoResult prepare(const VideoRequest& request) const;
-
-private:
-    /**
-     * Build video processing graph - deterministic, no side effects
-     * 
-     * Contract:
-     * - Pure function: same input = same output
-     * - No state modification
-     * 
-     * @param request Video processing parameters
-     * @return Graph data structure (no behavior)
-     */
-    VideoGraph build_graph(const VideoRequest& request) const;
+    VideoProcessResult construct_pipeline(const VideoProcessRequest& request) const;
 };
 
 }

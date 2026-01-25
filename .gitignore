@@ -2,3 +2,6 @@ Documentation/my_space/
 build/
 nx-core/build/
 .amazonq/
+build-audio/
+build-convert/
+build-video/

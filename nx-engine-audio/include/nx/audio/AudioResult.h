@@ -1,5 +1,5 @@
 #pragma once
-#include <nx-core/include/result.h>
+#include <result.h>
 #include <cstdint>
 
 namespace nx::audio {
