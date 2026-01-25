@@ -30,8 +30,8 @@ log_error() {
 
 # Get the latest semantic version tag
 get_latest_version() {
-    local latest_tag
-    latest_tag=$(git tag -l | grep -E "$SEMVER_PATTERN" | sort -V | tail -n1)
+    latest_tag=$(git tag -l | grep -E "$SEMVER_PATTERN" || true)
+    latest_tag=$(echo "$latest_tag" | sort -V | tail -n1)
     
     if [[ -z "$latest_tag" ]]; then
         echo "v0.0.0"
