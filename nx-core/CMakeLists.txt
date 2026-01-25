@@ -28,6 +28,7 @@ target_sources(nx-core
     PRIVATE
         src/nx_core.cpp
         src/nx_identity.cpp
+        src/logical_clock.cpp
 )
 
 # Compiler-specific settings

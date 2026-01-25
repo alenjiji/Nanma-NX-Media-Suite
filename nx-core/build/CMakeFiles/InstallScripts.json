@@ -1,8 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"D:/nanma_nx_media_suite/nx-core/build/cmake_install.cmake",
-		"D:/nanma_nx_media_suite/nx-core/build/tests/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

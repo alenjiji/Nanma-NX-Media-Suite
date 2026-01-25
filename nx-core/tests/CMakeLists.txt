@@ -14,5 +14,10 @@ cmake_minimum_required(VERSION 3.20)
 add_executable(test_nx_identity test_nx_identity.cpp)
 target_link_libraries(test_nx_identity nx-core)
 
-# Register test with CTest
+# Logical clock tests
+add_executable(test_logical_clock test_logical_clock.cpp)
+target_link_libraries(test_logical_clock nx-core)
+
+# Register tests with CTest
 add_test(NAME identity_tests COMMAND test_nx_identity)
+add_test(NAME logical_clock_tests COMMAND test_logical_clock)
