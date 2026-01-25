@@ -1,0 +1,140 @@
+name: Semantic Versioning and Tagging
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  version-check:
+    name: Version Check
+    runs-on: ubuntu-latest
+    outputs:
+      current-version: ${{ steps.version.outputs.current }}
+      next-version: ${{ steps.version.outputs.next }}
+      bump-type: ${{ steps.version.outputs.bump-type }}
+      should-tag: ${{ steps.version.outputs.should-tag }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for version computation
+    
+    - name: Make scripts executable
+      run: chmod +x scripts/*.sh
+    
+    - name: Compute version information
+      id: version
+      run: |
+        current=$(./scripts/compute-version.sh --current)
+        bump_type=$(./scripts/compute-version.sh --bump-type)
+        next=$(./scripts/compute-version.sh)
+        
+        echo "current=$current" >> $GITHUB_OUTPUT
+        echo "next=$next" >> $GITHUB_OUTPUT
+        echo "bump-type=$bump_type" >> $GITHUB_OUTPUT
+        
+        if [[ "$current" != "$next" && "$bump_type" != "none" ]]; then
+          echo "should-tag=true" >> $GITHUB_OUTPUT
+        else
+          echo "should-tag=false" >> $GITHUB_OUTPUT
+        fi
+        
+        echo "Current version: $current"
+        echo "Bump type: $bump_type"
+        echo "Next version: $next"
+    
+    - name: Validate version bump (PR only)
+      if: github.event_name == 'pull_request'
+      run: |
+        if [[ "${{ steps.version.outputs.bump-type }}" == "none" ]]; then
+          echo "::notice::No semver directive found - version will not change"
+        else
+          echo "::notice::Version will bump from ${{ steps.version.outputs.current }} to ${{ steps.version.outputs.next }} (${{ steps.version.outputs.bump-type }})"
+        fi
+
+  create-tag:
+    name: Create Release Tag
+    runs-on: ubuntu-latest
+    needs: version-check
+    if: |
+      github.event_name == 'push' && 
+      github.ref == 'refs/heads/main' && 
+      needs.version-check.outputs.should-tag == 'true'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+    
+    - name: Make scripts executable
+      run: chmod +x scripts/*.sh
+    
+    - name: Create and push tag
+      run: |
+        echo "Creating tag: ${{ needs.version-check.outputs.next-version }}"
+        ./scripts/create-tag.sh --force
+        git push origin ${{ needs.version-check.outputs.next-version }}
+    
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ needs.version-check.outputs.next-version }}
+        release_name: Release ${{ needs.version-check.outputs.next-version }}
+        body: |
+          ## Changes
+          
+          Version bump: ${{ needs.version-check.outputs.current-version }} → ${{ needs.version-check.outputs.next-version }}
+          Bump type: ${{ needs.version-check.outputs.bump-type }}
+          
+          See commit history for detailed changes.
+        draft: false
+        prerelease: false
+
+  phase-boundary-check:
+    name: Phase Boundary Protection
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Check for phase boundary violations
+      run: |
+        # Check if any phase boundary tags would be affected
+        phase_tags=$(git tag -l | grep -E "^phase-[0-9]+-.*-stable$" || true)
+        
+        if [[ -n "$phase_tags" ]]; then
+          echo "Phase boundary tags found:"
+          echo "$phase_tags"
+          
+          # Ensure phase tags are not being modified
+          for tag in $phase_tags; do
+            if ! git rev-parse "$tag" >/dev/null 2>&1; then
+              echo "::error::Phase boundary tag $tag is missing or corrupted"
+              exit 1
+            fi
+          done
+          
+          echo "::notice::Phase boundary tags are intact"
+        else
+          echo "::notice::No phase boundary tags found"
+        fi
