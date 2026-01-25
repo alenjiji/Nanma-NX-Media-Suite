@@ -22,7 +22,12 @@ target_link_libraries(test_logical_clock nx-core)
 add_executable(test_error_system test_error_system.cpp)
 target_link_libraries(test_error_system nx-core)
 
+# Result type tests
+add_executable(test_result test_result.cpp)
+target_link_libraries(test_result nx-core)
+
 # Register tests with CTest
 add_test(NAME identity_tests COMMAND test_nx_identity)
 add_test(NAME logical_clock_tests COMMAND test_logical_clock)
 add_test(NAME error_system_tests COMMAND test_error_system)
+add_test(NAME result_tests COMMAND test_result)

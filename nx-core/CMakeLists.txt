@@ -30,6 +30,7 @@ target_sources(nx-core
         src/nx_identity.cpp
         src/logical_clock.cpp
         src/error_system.cpp
+        src/result.cpp
 )
 
 # Compiler-specific settings
