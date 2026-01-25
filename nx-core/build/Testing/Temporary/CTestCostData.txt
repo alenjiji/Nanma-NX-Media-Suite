@@ -1,4 +1,0 @@
-identity_tests 1 0.0841466
-logical_clock_tests 1 0.0756978
-error_system_tests 1 0.0864838
----
