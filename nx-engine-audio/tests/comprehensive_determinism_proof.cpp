@@ -1,5 +1,6 @@
 #include <nx/audio/AudioEngine.h>
 #include <cassert>
+#include <iostream>
 
 using namespace nx::audio;
 
@@ -7,10 +8,11 @@ using namespace nx::audio;
 
 // Proof 1: Same input → same output
 void same_input_same_output() {
+    std::cout << "Testing same input → same output...";
     AudioEngine engine;
     
     AudioRequest request{
-        nx::core::LogicalClock{42},
+        LogicalClock{42},
         1001,
         2002,
         3003
@@ -24,15 +26,17 @@ void same_input_same_output() {
     assert(result1 == result2);
     assert(result2 == result3);
     assert(result1 == result3);
+    std::cout << " PASS\n";
 }
 
 // Proof 2: No hidden time dependency
 void no_hidden_time_dependency() {
+    std::cout << "Testing no hidden time dependency...";
     AudioEngine engine1;
     AudioEngine engine2;
     
     AudioRequest request{
-        nx::core::LogicalClock{100},
+        LogicalClock{100},
         5000,
         6000,
         7000
@@ -51,21 +55,23 @@ void no_hidden_time_dependency() {
     
     assert(result1 == result3);
     assert(result2 == result4);
+    std::cout << " PASS\n";
 }
 
 // Proof 3: Order stability
 void order_stability() {
+    std::cout << "Testing order stability...";
     AudioEngine engine;
     
     AudioRequest req_a{
-        nx::core::LogicalClock{10},
+        LogicalClock{10},
         100,
         200,
         300
     };
     
     AudioRequest req_b{
-        nx::core::LogicalClock{20},
+        LogicalClock{20},
         400,
         500,
         600
@@ -82,21 +88,23 @@ void order_stability() {
     // Results must be identical regardless of execution order
     assert(result_a1 == result_a2);
     assert(result_b1 == result_b2);
+    std::cout << " PASS\n";
 }
 
 // Proof 4: LogicalClock determinism
 void logical_clock_determinism() {
+    std::cout << "Testing LogicalClock determinism...";
     AudioEngine engine;
     
     AudioRequest req1{
-        nx::core::LogicalClock{1},
+        LogicalClock{1},
         42,
         100,
         200
     };
     
     AudioRequest req2{
-        nx::core::LogicalClock{1}, // Same LogicalClock
+        LogicalClock{1}, // Same LogicalClock
         42,
         100,
         200
@@ -107,19 +115,15 @@ void logical_clock_determinism() {
     
     // Same LogicalClock = same result
     assert(result1 == result2);
+    std::cout << " PASS\n";
 }
 
 int main() {
+    std::cout << "NX-Audio Comprehensive Determinism Proof\n";
     same_input_same_output();
     no_hidden_time_dependency();
     order_stability();
     logical_clock_determinism();
+    std::cout << "All tests PASSED\n";
     return 0;
 }
-
-// Determinism proof complete:
-// ✓ Same input → same output (no hidden state)
-// ✓ No hidden time dependency (LogicalClock only)
-// ✓ Order stability (execution order irrelevant)
-// ✓ Compile-only (no logic required)
-// ✓ Pure equality comparison (no mocks/timing)

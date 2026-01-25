@@ -18,11 +18,10 @@ add_library(nx-engine-convert
 
 target_include_directories(nx-engine-convert
     PUBLIC include
-    PRIVATE ${CMAKE_SOURCE_DIR}/nx-core/include
 )
 
 target_link_libraries(nx-engine-convert
-    PRIVATE nx-core
+    PUBLIC nx-core
 )
 
 # Tests (optional)

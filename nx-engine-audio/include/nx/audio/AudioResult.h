@@ -1,5 +1,4 @@
 #pragma once
-#include <result.h>
 #include <cstdint>
 
 namespace nx::audio {
@@ -21,9 +20,16 @@ struct AudioOutcome final {
 };
 
 /**
- * Result type for audio processing operations
- * Uses nx-core Result system for deterministic error handling
+ * Placeholder Result type for Phase 1.A compile-only skeleton
+ * Will be replaced with proper nx-core Result system in later phases
  */
-using AudioResult = nx::core::Result<AudioOutcome>;
+struct AudioResult final {
+    bool success;
+    AudioOutcome outcome;
+    
+    constexpr bool operator==(const AudioResult&) const = default;
+    constexpr bool is_success() const { return success; }
+    constexpr bool is_failure() const { return !success; }
+};
 
 }

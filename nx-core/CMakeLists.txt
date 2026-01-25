@@ -13,33 +13,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# NX-Core library target
-add_library(nx-core)
-
-# Header-first design
-target_include_directories(nx-core
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
+# NX-Core library target (INTERFACE-only)
+add_library(nx-core INTERFACE)
+target_include_directories(nx-core INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
-
-# Source files (minimal scaffolding)
-target_sources(nx-core
-    PRIVATE
-        src/nx_core.cpp
-        src/nx_identity.cpp
-        src/logical_clock.cpp
-        src/error_system.cpp
-        src/result.cpp
-        src/api_contract.cpp
-)
-
-# Compiler-specific settings
-if(MSVC)
-    target_compile_options(nx-core PRIVATE /W4)
-else()
-    target_compile_options(nx-core PRIVATE -Wall -Wextra -Wpedantic)
-endif()
 
 # Architectural constraint enforcement
 # NX-Core must have NO dependencies on higher layers

@@ -1,5 +1,7 @@
+#include <logical_clock.h>
 #include <nx/convert/TranscodeEngine.h>
 #include <cassert>
+#include <iostream>
 
 using namespace nx::convert;
 
@@ -7,10 +9,11 @@ using namespace nx::convert;
 
 // Proof 1: Same input → same output
 void same_input_same_output() {
+    std::cout << "Testing same input → same output...";
     TranscodeEngine engine;
     
     TranscodeRequest request{
-        nx::core::LogicalClock{42},
+        LogicalClock{42},
         1001,
         2002,
         3003
@@ -24,6 +27,7 @@ void same_input_same_output() {
     assert(result1 == result2);
     assert(result2 == result3);
     assert(result1 == result3);
+    std::cout << " PASS\n";
 }
 
 // Proof 2: No hidden time dependency
@@ -32,7 +36,7 @@ void no_hidden_time_dependency() {
     TranscodeEngine engine2;
     
     TranscodeRequest request{
-        nx::core::LogicalClock{100},
+        LogicalClock{100},
         5000,
         6000,
         7000
@@ -58,14 +62,14 @@ void order_stability() {
     TranscodeEngine engine;
     
     TranscodeRequest req_a{
-        nx::core::LogicalClock{10},
+        LogicalClock{10},
         100,
         200,
         300
     };
     
     TranscodeRequest req_b{
-        nx::core::LogicalClock{20},
+        LogicalClock{20},
         400,
         500,
         600
@@ -89,14 +93,14 @@ void logical_clock_determinism() {
     TranscodeEngine engine;
     
     TranscodeRequest req1{
-        nx::core::LogicalClock{1},
+        LogicalClock{1},
         42,
         100,
         200
     };
     
     TranscodeRequest req2{
-        nx::core::LogicalClock{1}, // Same LogicalClock
+        LogicalClock{1}, // Same LogicalClock
         42,
         100,
         200
@@ -112,14 +116,14 @@ void logical_clock_determinism() {
 // Proof 5: Value type equality
 void value_type_equality() {
     TranscodeRequest req1{
-        nx::core::LogicalClock{5},
+        LogicalClock{5},
         123,
         456,
         789
     };
     
     TranscodeRequest req2{
-        nx::core::LogicalClock{5},
+        LogicalClock{5},
         123,
         456,
         789
@@ -131,11 +135,13 @@ void value_type_equality() {
 }
 
 int main() {
+    std::cout << "NX-Convert Determinism Proof\n";
     same_input_same_output();
     no_hidden_time_dependency();
     order_stability();
     logical_clock_determinism();
     value_type_equality();
+    std::cout << "All tests PASSED\n";
     return 0;
 }
 
