@@ -18,6 +18,11 @@ target_link_libraries(test_nx_identity nx-core)
 add_executable(test_logical_clock test_logical_clock.cpp)
 target_link_libraries(test_logical_clock nx-core)
 
+# Error system tests
+add_executable(test_error_system test_error_system.cpp)
+target_link_libraries(test_error_system nx-core)
+
 # Register tests with CTest
 add_test(NAME identity_tests COMMAND test_nx_identity)
 add_test(NAME logical_clock_tests COMMAND test_logical_clock)
+add_test(NAME error_system_tests COMMAND test_error_system)
