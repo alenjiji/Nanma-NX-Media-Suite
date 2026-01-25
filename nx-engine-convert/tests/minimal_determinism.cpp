@@ -7,7 +7,7 @@ int main() {
     TranscodeEngine engine;
     
     TranscodeRequest request{
-        LogicalClock{1},
+        nx::core::LogicalClock{1},
         42,
         100,
         200
@@ -25,7 +25,7 @@ int main() {
     
     // Proof 3: Order stability
     TranscodeRequest req_other{
-        LogicalClock{2},
+        nx::core::LogicalClock{2},
         43,
         101,
         201

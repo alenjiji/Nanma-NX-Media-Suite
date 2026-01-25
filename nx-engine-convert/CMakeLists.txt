@@ -18,13 +18,34 @@ add_library(nx-engine-convert
 
 target_include_directories(nx-engine-convert
     PUBLIC include
+    PRIVATE ${CMAKE_SOURCE_DIR}/nx-core/include
+)
+
+target_link_libraries(nx-engine-convert
+    PRIVATE nx-core
 )
 
 # Tests (optional)
 option(BUILD_TESTS "Build tests" OFF)
 if(BUILD_TESTS)
+    add_executable(test_determinism
+        tests/TranscodeEngine_determinism_tests.cpp
+    )
+    
+    add_executable(determinism_proof
+        tests/determinism_proof.cpp
+    )
+    
     add_executable(minimal_determinism
         tests/minimal_determinism.cpp
+    )
+    
+    target_link_libraries(test_determinism
+        PRIVATE nx-engine-convert
+    )
+    
+    target_link_libraries(determinism_proof
+        PRIVATE nx-engine-convert
     )
     
     target_link_libraries(minimal_determinism
@@ -32,5 +53,7 @@ if(BUILD_TESTS)
     )
     
     enable_testing()
+    add_test(NAME determinism_test COMMAND test_determinism)
+    add_test(NAME determinism_proof_test COMMAND determinism_proof)
     add_test(NAME minimal_determinism_test COMMAND minimal_determinism)
 endif()
