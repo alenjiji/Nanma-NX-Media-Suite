@@ -1,8 +1,79 @@
 #include "audio_command.h"
 #include "audio_argument_parser.h"
+#include "nx/audio/AudioEngine.h"
 #include <iostream>
+#include <functional>
 
 namespace nx::cli {
+
+// Translation functions: CLI types -> Engine types
+static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioMeasureRequest& cli_request) {
+    nx::audio::AudioRequest engine_request;
+    
+    // Use hash of input path as audio ID for deterministic mapping
+    std::hash<std::string> hasher;
+    engine_request.input_audio_id = hasher(cli_request.input_path);
+    
+    // Use hash of standard as target format ID
+    std::string target_spec = std::to_string(static_cast<int>(cli_request.standard));
+    engine_request.target_format_id = hasher(target_spec);
+    
+    // Generate deterministic request ID
+    std::string request_spec = cli_request.input_path + target_spec;
+    engine_request.request_id = hasher(request_spec);
+    
+    // Set logical clock to 1 (deterministic)
+    engine_request.clock = {1};
+    
+    return engine_request;
+}
+
+static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioProcessRequest& cli_request) {
+    nx::audio::AudioRequest engine_request;
+    
+    // Use hash of input path as audio ID for deterministic mapping
+    std::hash<std::string> hasher;
+    engine_request.input_audio_id = hasher(cli_request.input_path);
+    
+    // Use hash of all DSP parameters as target format ID
+    std::string target_spec = cli_request.output_path;
+    if (cli_request.src_rate.has_value()) target_spec += std::to_string(*cli_request.src_rate);
+    if (cli_request.gain_db.has_value()) target_spec += std::to_string(*cli_request.gain_db);
+    if (cli_request.loudness_target.has_value()) target_spec += *cli_request.loudness_target;
+    if (cli_request.bit_depth.has_value()) target_spec += std::to_string(*cli_request.bit_depth);
+    if (cli_request.dither_type.has_value()) target_spec += std::to_string(static_cast<int>(*cli_request.dither_type));
+    
+    engine_request.target_format_id = hasher(target_spec);
+    
+    // Generate deterministic request ID
+    std::string request_spec = cli_request.input_path + target_spec;
+    engine_request.request_id = hasher(request_spec);
+    
+    // Set logical clock to 1 (deterministic)
+    engine_request.clock = {1};
+    
+    return engine_request;
+}
+
+static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioVerifyRequest& cli_request) {
+    nx::audio::AudioRequest engine_request;
+    
+    // Use hash of input path as audio ID for deterministic mapping
+    std::hash<std::string> hasher;
+    engine_request.input_audio_id = hasher(cli_request.input_path);
+    
+    // Use hash of output path as target format ID
+    engine_request.target_format_id = hasher(cli_request.output_path);
+    
+    // Generate deterministic request ID
+    std::string request_spec = cli_request.input_path + cli_request.output_path;
+    engine_request.request_id = hasher(request_spec);
+    
+    // Set logical clock to 1 (deterministic)
+    engine_request.clock = {1};
+    
+    return engine_request;
+}
 
 // Enum to string conversion for readable output
 static std::string loudness_standard_to_string(LoudnessStandard standard) {
@@ -73,30 +144,42 @@ CliResult AudioCommand::handle_verify(const std::vector<std::string>& args) {
 }
 
 CliResult AudioCommand::invoke_measure_engine(const AudioMeasureRequest& request) {
-    // TODO: Invoke nx::audio::AudioEngine::measure()
+    // Invoke actual AudioEngine
+    nx::audio::AudioEngine engine;
+    nx::audio::AudioRequest engine_request = translate_to_audio_engine_request(request);
     
-    if (request.flags.json_output) {
-        std::cout << "{\n";
-        std::cout << "  \"operation\": \"measure\",\n";
-        std::cout << "  \"input\": \"" << request.input_path << "\",\n";
-        std::cout << "  \"standard\": \"" << loudness_standard_to_string(request.standard) << "\",\n";
-        std::cout << "  \"status\": \"not_implemented\"\n";
-        std::cout << "}\n";
-    } else {
-        std::cout << "MEASURE: " << request.input_path << "\n";
-        std::cout << "Standard: " << loudness_standard_to_string(request.standard) << "\n";
-        if (request.report_path.has_value()) {
-            std::cout << "Report: " << *request.report_path << "\n";
+    auto result = engine.prepare(engine_request);
+    
+    if (result.is_success()) {
+        // Engine succeeded - preserve existing CLI output format
+        if (request.flags.json_output) {
+            std::cout << "{\n";
+            std::cout << "  \"operation\": \"measure\",\n";
+            std::cout << "  \"input\": \"" << request.input_path << "\",\n";
+            std::cout << "  \"standard\": \"" << loudness_standard_to_string(request.standard) << "\",\n";
+            std::cout << "  \"status\": \"prepared\",\n";
+            std::cout << "  \"graph_id\": \"" << result.outcome.graph_id << "\",\n";
+            std::cout << "  \"verification_token\": \"" << result.outcome.verification_token << "\"\n";
+            std::cout << "}\n";
+        } else {
+            std::cout << "MEASURE: " << request.input_path << "\n";
+            std::cout << "Standard: " << loudness_standard_to_string(request.standard) << "\n";
+            if (request.report_path.has_value()) {
+                std::cout << "Report: " << *request.report_path << "\n";
+            }
+            std::cout << "Status: Prepared successfully\n";
+            std::cout << "Graph ID: " << result.outcome.graph_id << "\n";
+            std::cout << "Verification: " << result.outcome.verification_token << "\n";
         }
-        std::cout << "Status: Not yet implemented\n";
+        return CliResult::ok();
+    } else {
+        // Engine failed - return existing CLI error format
+        return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "AudioEngine rejected measure request");
     }
-    
-    return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "AudioEngine measure not yet implemented");
 }
 
 CliResult AudioCommand::invoke_process_engine(const AudioProcessRequest& request) {
-    // TODO: Invoke nx::audio::AudioEngine::process()
-    
+    // Handle dry-run mode with existing CLI output format
     if (request.flags.dry_run) {
         if (request.flags.json_output) {
             std::cout << "{\n";
@@ -163,25 +246,62 @@ CliResult AudioCommand::invoke_process_engine(const AudioProcessRequest& request
         return CliResult::ok();
     }
     
-    return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "AudioEngine process not yet implemented");
+    // Invoke actual AudioEngine
+    nx::audio::AudioEngine engine;
+    nx::audio::AudioRequest engine_request = translate_to_audio_engine_request(request);
+    
+    auto result = engine.prepare(engine_request);
+    
+    if (result.is_success()) {
+        // Engine succeeded - preserve existing CLI success output format
+        if (request.flags.json_output) {
+            std::cout << "{\n";
+            std::cout << "  \"operation\": \"process\",\n";
+            std::cout << "  \"status\": \"prepared\",\n";
+            std::cout << "  \"graph_id\": \"" << result.outcome.graph_id << "\",\n";
+            std::cout << "  \"verification_token\": \"" << result.outcome.verification_token << "\"\n";
+            std::cout << "}\n";
+        } else {
+            std::cout << "Audio processing prepared successfully\n";
+            std::cout << "Graph ID: " << result.outcome.graph_id << "\n";
+            std::cout << "Verification: " << result.outcome.verification_token << "\n";
+        }
+        return CliResult::ok();
+    } else {
+        // Engine failed - return existing CLI error format
+        return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "AudioEngine rejected process request");
+    }
 }
 
 CliResult AudioCommand::invoke_verify_engine(const AudioVerifyRequest& request) {
-    // TODO: Invoke nx::audio::AudioEngine::verify()
+    // Invoke actual AudioEngine
+    nx::audio::AudioEngine engine;
+    nx::audio::AudioRequest engine_request = translate_to_audio_engine_request(request);
     
-    if (request.flags.json_output) {
-        std::cout << "{\n";
-        std::cout << "  \"operation\": \"verify\",\n";
-        std::cout << "  \"input\": \"" << request.input_path << "\",\n";
-        std::cout << "  \"output\": \"" << request.output_path << "\",\n";
-        std::cout << "  \"status\": \"not_implemented\"\n";
-        std::cout << "}\n";
+    auto result = engine.prepare(engine_request);
+    
+    if (result.is_success()) {
+        // Engine succeeded - preserve existing CLI output format
+        if (request.flags.json_output) {
+            std::cout << "{\n";
+            std::cout << "  \"operation\": \"verify\",\n";
+            std::cout << "  \"input\": \"" << request.input_path << "\",\n";
+            std::cout << "  \"output\": \"" << request.output_path << "\",\n";
+            std::cout << "  \"status\": \"prepared\",\n";
+            std::cout << "  \"graph_id\": \"" << result.outcome.graph_id << "\",\n";
+            std::cout << "  \"verification_token\": \"" << result.outcome.verification_token << "\"\n";
+            std::cout << "}\n";
+        } else {
+            std::cout << "VERIFY: " << request.input_path << " vs " << request.output_path << "\n";
+            std::cout << "Status: Prepared successfully\n";
+            std::cout << "Graph ID: " << result.outcome.graph_id << "\n";
+            std::cout << "Verification: " << result.outcome.verification_token << "\n";
+        }
+        return CliResult::ok();
     } else {
-        std::cout << "VERIFY: " << request.input_path << " vs " << request.output_path << "\n";
-        std::cout << "Status: Not yet implemented\n";
+        // Engine failed - return existing CLI error format
+        return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "AudioEngine rejected verify request");
     }
-    
-    return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "AudioEngine verify not yet implemented");
 }
 
 } // namespace nx::cli

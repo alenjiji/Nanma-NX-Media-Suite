@@ -31,6 +31,21 @@ set(CLI_SOURCES
 add_library(nx-cli-lib ${CLI_SOURCES})
 target_include_directories(nx-cli-lib PUBLIC include)
 
+# Engine dependencies (as subdirectories)
+add_subdirectory(../nx-core nx-core)
+add_subdirectory(../nx-engine-convert nx-engine-convert)
+add_subdirectory(../nx-engine-audio nx-engine-audio)
+add_subdirectory(../nx-engine-video nx-engine-video)
+add_subdirectory(../nx-engine-monitor nx-engine-monitor)
+
+# Link engines
+target_link_libraries(nx-cli-lib 
+    nx-engine-convert
+    nx-engine-audio
+    nx-engine-video
+    nx-engine-monitor
+)
+
 # Main executable
 add_executable(nx src/main.cpp)
 target_link_libraries(nx nx-cli-lib)

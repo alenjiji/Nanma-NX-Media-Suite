@@ -69,7 +69,7 @@ struct CliResult {
     bool success;
     
     static CliResult ok() {
-        return {CliErrorCode::NX_CLI_USAGE_ERROR, "", true};
+        return {CliErrorCode::NONE, "", true};
     }
     
     static CliResult error(CliErrorCode code, const std::string& msg) {
