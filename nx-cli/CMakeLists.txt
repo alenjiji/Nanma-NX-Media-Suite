@@ -22,6 +22,8 @@ set(CLI_SOURCES
     src/video_command.cpp
     src/batch_argument_parser.cpp
     src/batch_command.cpp
+    src/monitor_argument_parser.cpp
+    src/monitor_command.cpp
     src/nx_cli.cpp
 )
 

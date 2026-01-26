@@ -4,6 +4,7 @@
 #include "audio_command.h"
 #include "video_command.h"
 #include "batch_command.h"
+#include "monitor_command.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -44,7 +45,7 @@ CliResult NxCli::route_command(const std::vector<std::string>& args) {
     } else if (component == "batch") {
         return BatchCommand::execute(component_args);
     } else if (component == "monitor") {
-        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx monitor not yet implemented");
+        return MonitorCommand::execute(component_args);
     } else {
         return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Unknown component: " + component);
     }
@@ -105,6 +106,16 @@ void NxCli::print_component_help(const std::string& component) {
         std::cout << "  summarize   Static summary of batch file contents\n\n";
         std::cout << "IMPORTANT: No inference, reordering, or parallelism\n";
         std::cout << "Use 'nx batch <operation> --help' for operation-specific help\n";
+    } else if (component == "monitor") {
+        std::cout << "nx monitor - Read-only system observation\n\n";
+        std::cout << "Operations:\n";
+        std::cout << "  status      Global system status snapshot\n";
+        std::cout << "  jobs        List known jobs (summary only)\n";
+        std::cout << "  job         Single job snapshot\n";
+        std::cout << "  engines     List registered engines\n";
+        std::cout << "  version     Static version and build metadata\n\n";
+        std::cout << "IMPORTANT: Read-only observation only, no control operations\n";
+        std::cout << "Use 'nx monitor <operation> --help' for operation-specific help\n";
     } else {
         std::cout << "Help for " << component << " not yet implemented\n";
     }
