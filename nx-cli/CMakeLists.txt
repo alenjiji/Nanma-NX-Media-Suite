@@ -16,6 +16,8 @@ set(CLI_SOURCES
     src/convert_command.cpp
     src/metafix_argument_parser.cpp
     src/metafix_command.cpp
+    src/audio_argument_parser.cpp
+    src/audio_command.cpp
     src/nx_cli.cpp
 )
 

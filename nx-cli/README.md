@@ -74,6 +74,34 @@ nx metafix metadata-normalize \
   --schema ebu-r128
 ```
 
+### Audio Component
+```bash
+# Measure loudness (read-only)
+nx audio measure \
+  --input audio.wav \
+  --standard ebu-r128
+
+# Process with explicit DSP operations
+nx audio process \
+  --input input.wav \
+  --output output.wav \
+  --gain -3.5 \
+  --loudness-normalize -23LUFS \
+  --bit-depth 16 \
+  --dither triangular
+
+# Sample rate conversion
+nx audio process \
+  --input input.wav \
+  --output output.wav \
+  --src 48000
+
+# Verify processed audio
+nx audio verify \
+  --input original.wav \
+  --output processed.wav
+```
+
 ### Supported Flags
 
 #### Required for Transcode
@@ -115,10 +143,11 @@ The CLI will **reject** these with hard errors:
 - ✅ Core CLI structure and argument parsing
 - ✅ Convert component with transcode/analyze/verify operations
 - ✅ MetaFix component with repair/validate/metadata operations
+- ✅ Audio component with measure/process/verify operations
 - ✅ Strict validation according to specification
 - ✅ Deterministic output and error handling
 - ⏳ Engine integration (placeholder implementations)
-- ⏳ Additional components (audio, video, batch, monitor)
+- ⏳ Additional components (video, batch, monitor)
 
 ## Building
 

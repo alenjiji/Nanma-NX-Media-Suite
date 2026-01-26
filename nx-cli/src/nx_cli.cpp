@@ -1,6 +1,7 @@
 #include "nx_cli.h"
 #include "convert_command.h"
 #include "metafix_command.h"
+#include "audio_command.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -35,7 +36,7 @@ CliResult NxCli::route_command(const std::vector<std::string>& args) {
     } else if (component == "metafix") {
         return MetaFixCommand::execute(component_args);
     } else if (component == "audio") {
-        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx audio not yet implemented");
+        return AudioCommand::execute(component_args);
     } else if (component == "video") {
         return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx video not yet implemented");
     } else if (component == "batch") {
@@ -78,6 +79,14 @@ void NxCli::print_component_help(const std::string& component) {
         std::cout << "  metadata-normalize  Schema-based metadata normalization\n\n";
         std::cout << "IMPORTANT: --allow-essence-modification breaks read-only guarantee\n";
         std::cout << "Use 'nx metafix <operation> --help' for operation-specific help\n";
+    } else if (component == "audio") {
+        std::cout << "nx audio - Sample-accurate audio processing operations\n\n";
+        std::cout << "Operations:\n";
+        std::cout << "  measure    Read-only loudness and peak analysis\n";
+        std::cout << "  process    Apply explicit DSP graph to audio\n";
+        std::cout << "  verify     Verify deterministic correctness\n\n";
+        std::cout << "IMPORTANT: measure is read-only, process requires explicit DSP intent\n";
+        std::cout << "Use 'nx audio <operation> --help' for operation-specific help\n";
     } else {
         std::cout << "Help for " << component << " not yet implemented\n";
     }
