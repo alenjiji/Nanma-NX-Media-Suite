@@ -98,15 +98,32 @@ Real-time telemetry and observability engine.
 - **Dependencies**: Qt (UI layer only), platform-specific media libraries
 - **Hardware**: CPU with AVX2 support, optional GPU acceleration
 
-## Getting Started
+## Development Status
 
-1. **Installation**: Follow platform-specific installation guides
-2. **Configuration**: Set up processing presets and workflow definitions
-3. **Batch Processing**: Define job graphs for automated workflows
-4. **Monitoring**: Configure telemetry collection and reporting
+Nanma NX-MediaSuite follows a strict phased development approach with immutable architectural contracts. See [Documentation/Roadmap.md](Documentation/Roadmap.md) for the complete implementation roadmap.
+
+### Current Status: Phase Group C In Progress
+
+- **Phase Group A (Foundation)**: ✅ Complete & Locked - CLI, parsing, error handling
+- **Phase Group B (Observability)**: ✅ Complete & Locked - Monitor engine for system visibility
+- **Phase Group C (Orchestration)**: ✅ Complete - BatchEngine for deterministic batch planning
+- **Phase Group D (Session Ownership)**: ⏳ Next - Job lifecycle management
+- **Phase Group E (Execution)**: 🔄 Future - Synchronous job execution
+- **Phase Group F (Scale & Hardening)**: 🔄 Future - Performance and persistence
+
+### Architecture Maturity
+
+The system currently provides:
+- Complete CLI interface with deterministic parsing
+- Real-time system monitoring and engine discovery
+- Deterministic batch job planning with stable job IDs
+- Foundation for job execution and lifecycle management
+
+Next milestone: **Phase 7** - BatchPlan Session Architecture for job identity and lifecycle ownership.
 
 ## Documentation
 
+- [Development Roadmap](Documentation/Roadmap.md) - Official phased development plan and architectural contracts
 - [Architectural Principles](Documentation/architectural_principles.md) - Core design philosophy and constraints
 - [NX-Convert Pro Design](Documentation/nx_convert_pro_design.md) - Lossless transcoding engine
 - [NX-AudioLab Design](Documentation/nx_audiolab_design.md) - Professional audio processing
