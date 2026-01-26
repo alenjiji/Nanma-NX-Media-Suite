@@ -1,8 +1,13 @@
 #include "metafix_command.h"
 #include "metafix_argument_parser.h"
+#include "nx/meta/MetaEngine.h"
 #include <iostream>
 
 namespace nx::cli {
+
+static nx::meta::MetaRepairRequest translate_to_meta_engine_request(const RepairRequest& cli_request) {
+    return nx::meta::MetaRepairRequest{};
+}
 
 // Enum to string conversion for readable output
 static std::string repair_mode_to_string(RepairMode mode) {
@@ -109,8 +114,6 @@ CliResult MetaFixCommand::handle_metadata_normalize(const std::vector<std::strin
 }
 
 CliResult MetaFixCommand::invoke_repair_engine(const RepairRequest& request) {
-    // TODO: Invoke nx::meta::MetaEngine::repair()
-    
     if (request.flags.dry_run) {
         if (request.flags.json_output) {
             std::cout << "{\n";
@@ -137,8 +140,6 @@ CliResult MetaFixCommand::invoke_repair_engine(const RepairRequest& request) {
 }
 
 CliResult MetaFixCommand::invoke_validate_engine(const ValidateRequest& request) {
-    // TODO: Invoke nx::meta::MetaEngine::validate()
-    
     if (request.flags.json_output) {
         std::cout << "{\n";
         std::cout << "  \"operation\": \"validate\",\n";
@@ -155,13 +156,10 @@ CliResult MetaFixCommand::invoke_validate_engine(const ValidateRequest& request)
         }
         std::cout << "Status: Not yet implemented\n";
     }
-    
     return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "MetaEngine validate not yet implemented");
 }
 
 CliResult MetaFixCommand::invoke_metadata_copy_engine(const MetadataCopyRequest& request) {
-    // TODO: Invoke nx::meta::MetaEngine::copyMetadata()
-    
     if (request.flags.json_output) {
         std::cout << "{\n";
         std::cout << "  \"operation\": \"metadata-copy\",\n";
@@ -182,13 +180,10 @@ CliResult MetaFixCommand::invoke_metadata_copy_engine(const MetadataCopyRequest&
         std::cout << "Overwrite: " << (request.overwrite ? "yes" : "no") << "\n";
         std::cout << "Status: Not yet implemented\n";
     }
-    
     return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "MetaEngine copyMetadata not yet implemented");
 }
 
 CliResult MetaFixCommand::invoke_metadata_merge_engine(const MetadataMergeRequest& request) {
-    // TODO: Invoke nx::meta::MetaEngine::mergeMetadata()
-    
     if (request.flags.json_output) {
         std::cout << "{\n";
         std::cout << "  \"operation\": \"metadata-merge\",\n";
@@ -205,13 +200,10 @@ CliResult MetaFixCommand::invoke_metadata_merge_engine(const MetadataMergeReques
         std::cout << "METADATA-MERGE: " << request.input_paths.size() << " inputs -> " << request.output_path << "\n";
         std::cout << "Status: Not yet implemented\n";
     }
-    
     return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "MetaEngine mergeMetadata not yet implemented");
 }
 
 CliResult MetaFixCommand::invoke_metadata_normalize_engine(const MetadataNormalizeRequest& request) {
-    // TODO: Invoke nx::meta::MetaEngine::normalizeMetadata()
-    
     if (request.flags.json_output) {
         std::cout << "{\n";
         std::cout << "  \"operation\": \"metadata-normalize\",\n";
@@ -225,7 +217,6 @@ CliResult MetaFixCommand::invoke_metadata_normalize_engine(const MetadataNormali
         std::cout << "Schema: " << request.schema_id << "\n";
         std::cout << "Status: Not yet implemented\n";
     }
-    
     return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "MetaEngine normalizeMetadata not yet implemented");
 }
 
