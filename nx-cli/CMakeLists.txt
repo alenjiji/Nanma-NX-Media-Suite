@@ -14,6 +14,8 @@ include_directories(include)
 set(CLI_SOURCES
     src/argument_parser.cpp
     src/convert_command.cpp
+    src/metafix_argument_parser.cpp
+    src/metafix_command.cpp
     src/nx_cli.cpp
 )
 

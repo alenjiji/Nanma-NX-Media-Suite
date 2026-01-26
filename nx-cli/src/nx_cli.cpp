@@ -1,5 +1,6 @@
 #include "nx_cli.h"
 #include "convert_command.h"
+#include "metafix_command.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -31,12 +32,12 @@ CliResult NxCli::route_command(const std::vector<std::string>& args) {
     
     if (component == "convert") {
         return ConvertCommand::execute(component_args);
+    } else if (component == "metafix") {
+        return MetaFixCommand::execute(component_args);
     } else if (component == "audio") {
         return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx audio not yet implemented");
     } else if (component == "video") {
         return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx video not yet implemented");
-    } else if (component == "metafix") {
-        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx metafix not yet implemented");
     } else if (component == "batch") {
         return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx batch not yet implemented");
     } else if (component == "monitor") {
@@ -67,6 +68,16 @@ void NxCli::print_component_help(const std::string& component) {
         std::cout << "  analyze     Analyze media streams (read-only)\n";
         std::cout << "  verify      Verify transcoding results\n\n";
         std::cout << "Use 'nx convert <operation> --help' for operation-specific help\n";
+    } else if (component == "metafix") {
+        std::cout << "nx metafix - Metadata and container repair operations\n\n";
+        std::cout << "Operations:\n";
+        std::cout << "  repair              Structural container repair\n";
+        std::cout << "  validate            Compliance and integrity validation\n";
+        std::cout << "  metadata-copy       Copy metadata categories between containers\n";
+        std::cout << "  metadata-merge      Merge metadata from multiple sources\n";
+        std::cout << "  metadata-normalize  Schema-based metadata normalization\n\n";
+        std::cout << "IMPORTANT: --allow-essence-modification breaks read-only guarantee\n";
+        std::cout << "Use 'nx metafix <operation> --help' for operation-specific help\n";
     } else {
         std::cout << "Help for " << component << " not yet implemented\n";
     }

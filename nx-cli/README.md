@@ -42,6 +42,38 @@ nx convert analyze --input input.mov
 nx convert verify --input input.mov --output output.mp4
 ```
 
+### MetaFix Component
+```bash
+# Repair container structure
+nx metafix repair \
+  --input broken.mov \
+  --output fixed.mov \
+  --mode header-rebuild
+
+# Validate compliance
+nx metafix validate \
+  --input test.mov \
+  --profile broadcast
+
+# Copy metadata categories
+nx metafix metadata-copy \
+  --source source.mov \
+  --target target.mov \
+  --categories technical,rights
+
+# Merge metadata with precedence
+nx metafix metadata-merge \
+  --inputs file1.mov,file2.mov \
+  --output merged.mov \
+  --precedence file1.mov,file2.mov
+
+# Normalize metadata schema
+nx metafix metadata-normalize \
+  --input input.mov \
+  --output normalized.mov \
+  --schema ebu-r128
+```
+
 ### Supported Flags
 
 #### Required for Transcode
@@ -82,10 +114,11 @@ The CLI will **reject** these with hard errors:
 
 - ✅ Core CLI structure and argument parsing
 - ✅ Convert component with transcode/analyze/verify operations
+- ✅ MetaFix component with repair/validate/metadata operations
 - ✅ Strict validation according to specification
 - ✅ Deterministic output and error handling
 - ⏳ Engine integration (placeholder implementations)
-- ⏳ Additional components (audio, video, metafix, batch, monitor)
+- ⏳ Additional components (audio, video, batch, monitor)
 
 ## Building
 
