@@ -2,77 +2,19 @@
 #include "video_argument_parser.h"
 #include "nx/video/VideoEngine.h"
 #include <iostream>
-#include <functional>
 
 namespace nx::cli {
 
-// Translation functions: CLI types -> Engine types
 static nx::video::VideoRequest translate_to_video_engine_request(const VideoAnalyzeRequest& cli_request) {
-    nx::video::VideoRequest engine_request;
-    
-    // Use hash of input path as video ID for deterministic mapping
-    std::hash<std::string> hasher;
-    engine_request.input_video_id = hasher(cli_request.input_path);
-    
-    // Use fixed target format ID for analyze operation
-    engine_request.target_format_id = hasher("analyze");
-    
-    // Generate deterministic request ID
-    std::string request_spec = cli_request.input_path + "analyze";
-    engine_request.request_id = hasher(request_spec);
-    
-    // Set logical clock to 1 (deterministic)
-    engine_request.clock = nx::core::LogicalClock{1};
-    
-    return engine_request;
+    return nx::video::VideoRequest{};
 }
 
 static nx::video::VideoRequest translate_to_video_engine_request(const VideoProcessRequest& cli_request) {
-    nx::video::VideoRequest engine_request;
-    
-    // Use hash of input path as video ID for deterministic mapping
-    std::hash<std::string> hasher;
-    engine_request.input_video_id = hasher(cli_request.input_path);
-    
-    // Use hash of all video parameters as target format ID
-    std::string target_spec = cli_request.output_path;
-    if (cli_request.scale_dimensions.has_value()) target_spec += *cli_request.scale_dimensions;
-    if (cli_request.crop_parameters.has_value()) target_spec += *cli_request.crop_parameters;
-    if (cli_request.pixel_format.has_value()) target_spec += *cli_request.pixel_format;
-    if (cli_request.color_space.has_value()) target_spec += *cli_request.color_space;
-    if (cli_request.range.has_value()) target_spec += std::to_string(static_cast<int>(*cli_request.range));
-    if (cli_request.hdr_mode.has_value()) target_spec += std::to_string(static_cast<int>(*cli_request.hdr_mode));
-    
-    engine_request.target_format_id = hasher(target_spec);
-    
-    // Generate deterministic request ID
-    std::string request_spec = cli_request.input_path + target_spec;
-    engine_request.request_id = hasher(request_spec);
-    
-    // Set logical clock to 1 (deterministic)
-    engine_request.clock = nx::core::LogicalClock{1};
-    
-    return engine_request;
+    return nx::video::VideoRequest{};
 }
 
 static nx::video::VideoRequest translate_to_video_engine_request(const VideoVerifyRequest& cli_request) {
-    nx::video::VideoRequest engine_request;
-    
-    // Use hash of input path as video ID for deterministic mapping
-    std::hash<std::string> hasher;
-    engine_request.input_video_id = hasher(cli_request.input_path);
-    
-    // Use hash of output path as target format ID
-    engine_request.target_format_id = hasher(cli_request.output_path);
-    
-    // Generate deterministic request ID
-    std::string request_spec = cli_request.input_path + cli_request.output_path;
-    engine_request.request_id = hasher(request_spec);
-    
-    // Set logical clock to 1 (deterministic)
-    engine_request.clock = nx::core::LogicalClock{1};
-    
-    return engine_request;
+    return nx::video::VideoRequest{};
 }
 
 // Enum to string conversion for readable output
@@ -142,14 +84,10 @@ CliResult VideoCommand::handle_verify(const std::vector<std::string>& args) {
 }
 
 CliResult VideoCommand::invoke_analyze_engine(const VideoAnalyzeRequest& request) {
-    // Invoke actual VideoEngine
     nx::video::VideoEngine engine;
-    nx::video::VideoRequest engine_request = translate_to_video_engine_request(request);
-    
-    auto result = engine.prepare(engine_request);
+    auto result = engine.prepare(translate_to_video_engine_request(request));
     
     if (result.is_success()) {
-        // Engine succeeded - preserve existing CLI output format
         auto outcome = result.get_value();
         if (request.flags.json_output) {
             std::cout << "{\n";
@@ -167,14 +105,11 @@ CliResult VideoCommand::invoke_analyze_engine(const VideoAnalyzeRequest& request
         }
         return CliResult::ok();
     } else {
-        // Engine failed - return existing CLI error format
         return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "VideoEngine rejected analyze request");
     }
 }
 
 CliResult VideoCommand::invoke_process_engine(const VideoProcessRequest& request) {
-    // TODO: Invoke nx::video::VideoEngine::process()
-    
     if (request.flags.dry_run) {
         if (request.flags.json_output) {
             std::cout << "{\n";
@@ -256,8 +191,6 @@ CliResult VideoCommand::invoke_process_engine(const VideoProcessRequest& request
 }
 
 CliResult VideoCommand::invoke_verify_engine(const VideoVerifyRequest& request) {
-    // TODO: Invoke nx::video::VideoEngine::verify()
-    
     if (request.flags.json_output) {
         std::cout << "{\n";
         std::cout << "  \"operation\": \"verify\",\n";
@@ -269,7 +202,6 @@ CliResult VideoCommand::invoke_verify_engine(const VideoVerifyRequest& request) 
         std::cout << "VERIFY: " << request.input_path << " vs " << request.output_path << "\n";
         std::cout << "Status: Not yet implemented\n";
     }
-    
     return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "VideoEngine verify not yet implemented");
 }
 
