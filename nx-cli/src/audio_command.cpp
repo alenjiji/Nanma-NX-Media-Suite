@@ -6,30 +6,15 @@
 namespace nx::cli {
 
 static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioMeasureRequest& cli_request) {
-    nx::audio::AudioRequest engine_request;
-    engine_request.input_audio_id = 0;
-    engine_request.target_format_id = 0;
-    engine_request.request_id = 0;
-    engine_request.clock = {0};
-    return engine_request;
+    return nx::audio::AudioRequest{};
 }
 
 static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioProcessRequest& cli_request) {
-    nx::audio::AudioRequest engine_request;
-    engine_request.input_audio_id = 0;
-    engine_request.target_format_id = 0;
-    engine_request.request_id = 0;
-    engine_request.clock = {0};
-    return engine_request;
+    return nx::audio::AudioRequest{};
 }
 
 static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioVerifyRequest& cli_request) {
-    nx::audio::AudioRequest engine_request;
-    engine_request.input_audio_id = 0;
-    engine_request.target_format_id = 0;
-    engine_request.request_id = 0;
-    engine_request.clock = {0};
-    return engine_request;
+    return nx::audio::AudioRequest{};
 }
 
 // Enum to string conversion for readable output
