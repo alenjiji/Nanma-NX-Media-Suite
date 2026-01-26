@@ -38,6 +38,14 @@ target_link_libraries(test_batchflow_workflow nx-core)
 add_executable(test_determinism_critical test_determinism_critical.cpp)
 target_link_libraries(test_determinism_critical nx-core)
 
+# Law violation tests
+add_executable(test_law_violations test_law_violations.cpp)
+target_link_libraries(test_law_violations nx-core)
+
+# Replay proof tests (Crown Jewel)
+add_executable(test_replay_proof test_replay_proof.cpp)
+target_link_libraries(test_replay_proof nx-core)
+
 # Register tests with CTest
 add_test(NAME identity_tests COMMAND test_nx_identity)
 add_test(NAME logical_clock_tests COMMAND test_logical_clock)
@@ -46,3 +54,5 @@ add_test(NAME result_tests COMMAND test_result)
 add_test(NAME api_contract_tests COMMAND test_api_contract)
 add_test(NAME batchflow_workflow_tests COMMAND test_batchflow_workflow)
 add_test(NAME determinism_critical_tests COMMAND test_determinism_critical)
+add_test(NAME law_violation_tests COMMAND test_law_violations)
+add_test(NAME replay_proof_tests COMMAND test_replay_proof)
