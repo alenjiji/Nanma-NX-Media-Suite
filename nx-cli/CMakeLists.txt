@@ -20,6 +20,8 @@ set(CLI_SOURCES
     src/audio_command.cpp
     src/video_argument_parser.cpp
     src/video_command.cpp
+    src/batch_argument_parser.cpp
+    src/batch_command.cpp
     src/nx_cli.cpp
 )
 

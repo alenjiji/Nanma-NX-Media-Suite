@@ -16,9 +16,14 @@ target_link_libraries(test_audio_cli nx-cli-lib)
 add_executable(test_video_cli test_video_cli.cpp)
 target_link_libraries(test_video_cli nx-cli-lib)
 
+# Batch test executable
+add_executable(test_batch_cli test_batch_cli.cpp)
+target_link_libraries(test_batch_cli nx-cli-lib)
+
 # Add test to CTest
 enable_testing()
 add_test(NAME cli_tests COMMAND test_cli)
 add_test(NAME metafix_cli_tests COMMAND test_metafix_cli)
 add_test(NAME audio_cli_tests COMMAND test_audio_cli)
 add_test(NAME video_cli_tests COMMAND test_video_cli)
+add_test(NAME batch_cli_tests COMMAND test_batch_cli)

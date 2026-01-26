@@ -3,6 +3,7 @@
 #include "metafix_command.h"
 #include "audio_command.h"
 #include "video_command.h"
+#include "batch_command.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -41,7 +42,7 @@ CliResult NxCli::route_command(const std::vector<std::string>& args) {
     } else if (component == "video") {
         return VideoCommand::execute(component_args);
     } else if (component == "batch") {
-        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx batch not yet implemented");
+        return BatchCommand::execute(component_args);
     } else if (component == "monitor") {
         return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx monitor not yet implemented");
     } else {
@@ -96,6 +97,14 @@ void NxCli::print_component_help(const std::string& component) {
         std::cout << "  verify     Verify deterministic correctness\n\n";
         std::cout << "IMPORTANT: All video transformations must be explicitly declared\n";
         std::cout << "Use 'nx video <operation> --help' for operation-specific help\n";
+    } else if (component == "batch") {
+        std::cout << "nx batch - Deterministic command list executor\n\n";
+        std::cout << "Operations:\n";
+        std::cout << "  run         Execute batch file sequentially\n";
+        std::cout << "  validate    Validate batch file without execution\n";
+        std::cout << "  summarize   Static summary of batch file contents\n\n";
+        std::cout << "IMPORTANT: No inference, reordering, or parallelism\n";
+        std::cout << "Use 'nx batch <operation> --help' for operation-specific help\n";
     } else {
         std::cout << "Help for " << component << " not yet implemented\n";
     }
