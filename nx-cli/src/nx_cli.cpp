@@ -2,6 +2,7 @@
 #include "convert_command.h"
 #include "metafix_command.h"
 #include "audio_command.h"
+#include "video_command.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -38,7 +39,7 @@ CliResult NxCli::route_command(const std::vector<std::string>& args) {
     } else if (component == "audio") {
         return AudioCommand::execute(component_args);
     } else if (component == "video") {
-        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx video not yet implemented");
+        return VideoCommand::execute(component_args);
     } else if (component == "batch") {
         return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "nx batch not yet implemented");
     } else if (component == "monitor") {
@@ -87,6 +88,14 @@ void NxCli::print_component_help(const std::string& component) {
         std::cout << "  verify     Verify deterministic correctness\n\n";
         std::cout << "IMPORTANT: measure is read-only, process requires explicit DSP intent\n";
         std::cout << "Use 'nx audio <operation> --help' for operation-specific help\n";
+    } else if (component == "video") {
+        std::cout << "nx video - Deterministic video processing operations\n\n";
+        std::cout << "Operations:\n";
+        std::cout << "  analyze    Read-only structural and format analysis\n";
+        std::cout << "  process    Apply explicit video processing graph\n";
+        std::cout << "  verify     Verify deterministic correctness\n\n";
+        std::cout << "IMPORTANT: All video transformations must be explicitly declared\n";
+        std::cout << "Use 'nx video <operation> --help' for operation-specific help\n";
     } else {
         std::cout << "Help for " << component << " not yet implemented\n";
     }

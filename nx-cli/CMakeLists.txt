@@ -18,6 +18,8 @@ set(CLI_SOURCES
     src/metafix_command.cpp
     src/audio_argument_parser.cpp
     src/audio_command.cpp
+    src/video_argument_parser.cpp
+    src/video_command.cpp
     src/nx_cli.cpp
 )
 

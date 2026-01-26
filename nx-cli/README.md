@@ -102,7 +102,38 @@ nx audio verify \
   --output processed.wav
 ```
 
-### Supported Flags
+### Video Component
+```bash
+# Analyze video structure (read-only)
+nx video analyze \
+  --input video.mp4
+
+# Process with explicit video operations
+nx video process \
+  --input input.mp4 \
+  --output output.mp4 \
+  --scale 1920x1080 \
+  --crop 1920x800+0+140 \
+  --color-space bt709 \
+  --range full
+
+# Pixel format conversion
+nx video process \
+  --input input.mp4 \
+  --output output.mp4 \
+  --pixel-format yuv420p
+
+# HDR handling
+nx video process \
+  --input input.mp4 \
+  --output output.mp4 \
+  --hdr strip
+
+# Verify processed video
+nx video verify \
+  --input original.mp4 \
+  --output processed.mp4
+```
 
 #### Required for Transcode
 - `--input <path>` - Input file path
@@ -144,10 +175,11 @@ The CLI will **reject** these with hard errors:
 - ✅ Convert component with transcode/analyze/verify operations
 - ✅ MetaFix component with repair/validate/metadata operations
 - ✅ Audio component with measure/process/verify operations
+- ✅ Video component with analyze/process/verify operations
 - ✅ Strict validation according to specification
 - ✅ Deterministic output and error handling
 - ⏳ Engine integration (placeholder implementations)
-- ⏳ Additional components (video, batch, monitor)
+- ⏳ Additional components (batch, monitor)
 
 ## Building
 
