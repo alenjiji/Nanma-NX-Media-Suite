@@ -159,7 +159,16 @@ public:
     std::vector<JobId> get_dependents(const JobId& job_id) const;
     
     /// Get job node by ID (only available after finalization)
-    const JobNode* get_node(const JobId& job_id) const;
+    const JobNode* get_node(const JobId& job_id) const {
+        if (!finalized_) {
+            throw std::runtime_error("Graph must be finalized before accessing nodes");
+        }
+        auto it = node_index_.find(job_id);
+        if (it != node_index_.end()) {
+            return &nodes_[it->second];
+        }
+        return nullptr; // Node not found
+    }
     
     /// Validate DAG properties (acyclic only)
     /// Called automatically during finalize(), can be called manually for validation
