@@ -13,6 +13,7 @@ include_directories(include)
 # Source files
 set(MONITOR_ENGINE_SOURCES
     src/NullMonitorEngine.cpp
+    src/RealMonitorEngine.cpp
 )
 
 # Monitor Engine Library
