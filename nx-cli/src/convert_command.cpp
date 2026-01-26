@@ -6,12 +6,7 @@
 namespace nx::cli {
 
 static nx::convert::TranscodeRequest translate_to_engine_request(const TranscodeRequest& cli_request) {
-    nx::convert::TranscodeRequest engine_request;
-    engine_request.input_container_id = 0;
-    engine_request.target_format_id = 0;
-    engine_request.request_id = 0;
-    engine_request.clock = {0};
-    return engine_request;
+    return nx::convert::TranscodeRequest{};
 }
 
 CliResult ConvertCommand::execute(const std::vector<std::string>& args) {
