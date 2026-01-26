@@ -1,15 +1,34 @@
-#include "nx/meta/MetaEngine.h"
+#include "../include/nx/meta/MetaEngine.h"
+#include <result.h>
 
 namespace nx::meta {
 
-// NO LOGIC — PHASE 1.A
-// Compile-only skeleton - no metadata repair logic
-// Media essence is read-only by default
-// Deterministic by construction
+nx::core::Result<MetaRepairRequest> parse_meta_repair_request(
+    std::string_view serialized_params
+) noexcept {
+    // Phase 1.A stub implementation - no logic
+    // Real implementation would parse JSON and extract:
+    // - clock (LogicalClock)
+    // - request_id (uint64_t)
+    // - container_id (ContainerId)
+    // - repair_graph_id (RepairGraphId)
+    
+    // For now, fail with explicit message about missing implementation
+    return nx::core::fail<MetaRepairRequest>(
+        nx::core::ErrorCode::NotImplemented,
+        nx::core::ErrorSeverity::Error,
+        "parse_meta_repair_request: Phase 1.A stub - parsing not implemented"
+    );
+}
+
 MetaRepairResult MetaEngine::plan_repair(const MetaRepairRequest& request) const {
-    (void)request;
-    // Return deterministic success - no repair planning logic in Phase 1.A
-    return nx::core::ok(MetaRepairOutcome{RepairGraphId{0}, 0});
+    // Phase 1.A stub implementation - no logic
+    MetaRepairOutcome outcome{
+        request.repair_graph_id,
+        12345  // Placeholder validation token
+    };
+    
+    return nx::core::ok(outcome);
 }
 
 }

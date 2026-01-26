@@ -5,8 +5,27 @@
 #include "MetaRepairRequest.h"
 #include "MetaRepairResult.h"
 #include "Errors.h"
+#include <string_view>
 
 namespace nx::meta {
+
+/**
+ * Parse serialized parameters into MetaRepairRequest
+ * 
+ * Phase 3.B Adapter Support Function
+ * 
+ * Contract:
+ * - Deterministic: same input = same result
+ * - No side effects: pure parsing function
+ * - Validates all required fields
+ * - Fails if parameters incomplete or invalid
+ * 
+ * @param serialized_params JSON string containing repair parameters
+ * @return Result containing MetaRepairRequest or explicit error
+ */
+nx::core::Result<MetaRepairRequest> parse_meta_repair_request(
+    std::string_view serialized_params
+) noexcept;
 
 /**
  * NX-MetaFix Core Engine
