@@ -36,11 +36,12 @@ void test_stable_engine_ordering() {
     auto engines = engine.engines();
     
     // Verify expected engines in stable order
-    assert(engines.size() == 4);
+    assert(engines.size() == 5);
     assert(engines[0].name == "NX-Convert Pro");
     assert(engines[1].name == "NX-AudioLab");
     assert(engines[2].name == "NX-VideoTrans");
     assert(engines[3].name == "NX-MetaFix");
+    assert(engines[4].name == "NX-BatchFlow");
 }
 
 void test_empty_jobs() {
@@ -75,6 +76,20 @@ void test_system_status_aggregation() {
     assert(status.completed_jobs == 0);
 }
 
+void test_batch_engine_availability() {
+    RealMonitorEngine engine;
+    
+    auto engines = engine.engines();
+    
+    // Find BatchEngine in list
+    auto batch_engine = std::find_if(engines.begin(), engines.end(), 
+        [](const EngineInfo& info) { return info.name == "NX-BatchFlow"; });
+    
+    assert(batch_engine != engines.end());
+    assert(batch_engine->version == "1.0.0");
+    assert(batch_engine->available == true);
+}
+
 int main() {
     test_deterministic_status();
     test_deterministic_engines();
@@ -82,6 +97,7 @@ int main() {
     test_empty_jobs();
     test_version_info();
     test_system_status_aggregation();
+    test_batch_engine_availability();
     
     return 0;
 }
