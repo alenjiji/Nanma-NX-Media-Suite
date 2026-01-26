@@ -6,63 +6,98 @@ using namespace nx::batch;
 void test_deterministic_plan_batch() {
     BatchEngineImpl engine;
     
-    auto plan1 = engine.plan_batch("test.batch");
-    auto plan2 = engine.plan_batch("test.batch");
+    std::vector<ParsedBatchCommand> commands = {
+        {"nx convert --input test.mp4 --output test.mkv", {"nx", "convert", "--input", "test.mp4", "--output", "test.mkv"}, true},
+        {"nx audio --input test.wav --output test.flac", {"nx", "audio", "--input", "test.wav", "--output", "test.flac"}, true}
+    };
+    
+    auto plan1 = engine.plan_batch(commands);
+    auto plan2 = engine.plan_batch(commands);
     
     assert(plan1 == plan2);
-    assert(plan1.jobs.empty());
+    assert(plan1.jobs.size() == 2);
+    
+    // Verify job IDs are deterministic
+    assert(plan1.jobs[0].job_id.value == "job-001");
+    assert(plan1.jobs[1].job_id.value == "job-002");
 }
 
-void test_deterministic_jobs() {
+void test_job_states() {
     BatchEngineImpl engine;
     
-    auto jobs1 = engine.jobs();
-    auto jobs2 = engine.jobs();
+    std::vector<ParsedBatchCommand> commands = {
+        {"nx convert --input test.mp4 --output test.mkv", {"nx", "convert", "--input", "test.mp4", "--output", "test.mkv"}, true},
+        {"invalid command", {"invalid", "command"}, false},
+        {"nx audio --input test.wav --output test.flac", {"nx", "audio", "--input", "test.wav", "--output", "test.flac"}, true}
+    };
     
-    assert(jobs1 == jobs2);
-    assert(jobs1.empty());
+    auto plan = engine.plan_batch(commands);
+    
+    assert(plan.jobs.size() == 3);
+    assert(plan.jobs[0].state == JobState::Planned);
+    assert(plan.jobs[1].state == JobState::Rejected);
+    assert(plan.jobs[2].state == JobState::Planned);
 }
 
-void test_deterministic_job_lookup() {
+void test_stable_ordering() {
     BatchEngineImpl engine;
     
-    JobId test_id{"test"};
-    auto job1 = engine.job(test_id);
-    auto job2 = engine.job(test_id);
+    std::vector<ParsedBatchCommand> commands = {
+        {"nx convert --input a.mp4 --output a.mkv", {"nx", "convert", "--input", "a.mp4", "--output", "a.mkv"}, true},
+        {"nx audio --input b.wav --output b.flac", {"nx", "audio", "--input", "b.wav", "--output", "b.flac"}, true},
+        {"nx video --input c.mp4 --output c.mkv", {"nx", "video", "--input", "c.mp4", "--output", "c.mkv"}, true}
+    };
     
-    assert(job1 == job2);
-    assert(!job1.has_value());
+    auto plan1 = engine.plan_batch(commands);
+    auto plan2 = engine.plan_batch(commands);
+    
+    assert(plan1.jobs.size() == plan2.jobs.size());
+    for (size_t i = 0; i < plan1.jobs.size(); ++i) {
+        assert(plan1.jobs[i].job_id == plan2.jobs[i].job_id);
+        assert(plan1.jobs[i].command == plan2.jobs[i].command);
+        assert(plan1.jobs[i].state == plan2.jobs[i].state);
+    }
 }
 
-void test_no_side_effects() {
+void test_empty_commands() {
     BatchEngineImpl engine;
     
-    // Multiple calls should not change behavior
-    engine.plan_batch("file1.batch");
-    engine.plan_batch("file2.batch");
-    engine.jobs();
-    engine.job(JobId{"any"});
+    std::vector<ParsedBatchCommand> commands;
+    auto plan = engine.plan_batch(commands);
     
-    // Verify still empty
-    assert(engine.jobs().empty());
-    assert(!engine.job(JobId{"test"}).has_value());
+    assert(plan.jobs.empty());
 }
 
-void test_job_id_equality() {
-    JobId id1{"test"};
-    JobId id2{"test"};
-    JobId id3{"other"};
+void test_stateless_behavior() {
+    BatchEngineImpl engine;
     
-    assert(id1 == id2);
-    assert(!(id1 == id3));
+    std::vector<ParsedBatchCommand> commands1 = {
+        {"nx convert --input test1.mp4 --output test1.mkv", {"nx", "convert", "--input", "test1.mp4", "--output", "test1.mkv"}, true}
+    };
+    
+    std::vector<ParsedBatchCommand> commands2 = {
+        {"nx audio --input test2.wav --output test2.flac", {"nx", "audio", "--input", "test2.wav", "--output", "test2.flac"}, true}
+    };
+    
+    auto plan1 = engine.plan_batch(commands1);
+    auto plan2 = engine.plan_batch(commands2);
+    
+    // Plans should be independent
+    assert(plan1.jobs.size() == 1);
+    assert(plan2.jobs.size() == 1);
+    assert(plan1.jobs[0].command != plan2.jobs[0].command);
+    
+    // Re-running first plan should be identical
+    auto plan1_again = engine.plan_batch(commands1);
+    assert(plan1 == plan1_again);
 }
 
 int main() {
     test_deterministic_plan_batch();
-    test_deterministic_jobs();
-    test_deterministic_job_lookup();
-    test_no_side_effects();
-    test_job_id_equality();
+    test_job_states();
+    test_stable_ordering();
+    test_empty_commands();
+    test_stateless_behavior();
     
     return 0;
 }

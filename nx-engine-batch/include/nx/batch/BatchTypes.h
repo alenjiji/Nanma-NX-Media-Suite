@@ -18,6 +18,14 @@ struct JobId {
     bool operator==(const JobId& other) const = default;
 };
 
+struct ParsedBatchCommand {
+    std::string command;
+    std::vector<std::string> arguments;
+    bool valid;
+    
+    bool operator==(const ParsedBatchCommand& other) const = default;
+};
+
 struct BatchJobSummary {
     JobId job_id;
     std::string command;
