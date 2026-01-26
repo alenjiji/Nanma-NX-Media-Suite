@@ -1,8 +1,18 @@
 #include "convert_command.h"
 #include "argument_parser.h"
+#include "nx/convert/TranscodeEngine.h"
 #include <iostream>
 
 namespace nx::cli {
+
+static nx::convert::TranscodeRequest translate_to_engine_request(const TranscodeRequest& cli_request) {
+    nx::convert::TranscodeRequest engine_request;
+    engine_request.input_container_id = 0;
+    engine_request.target_format_id = 0;
+    engine_request.request_id = 0;
+    engine_request.clock = {0};
+    return engine_request;
+}
 
 CliResult ConvertCommand::execute(const std::vector<std::string>& args) {
     if (args.empty()) {
@@ -56,9 +66,6 @@ CliResult ConvertCommand::handle_verify(const std::vector<std::string>& args) {
 }
 
 CliResult ConvertCommand::invoke_transcode_engine(const TranscodeRequest& request) {
-    // TODO: This is where we would invoke nx::convert::TranscodeEngine::execute()
-    // For now, implement dry-run behavior
-    
     if (request.flags.dry_run) {
         if (request.flags.json_output) {
             std::cout << "{\n";
@@ -88,13 +95,29 @@ CliResult ConvertCommand::invoke_transcode_engine(const TranscodeRequest& reques
         return CliResult::ok();
     }
     
-    // Placeholder for actual engine invocation
-    return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "TranscodeEngine not yet implemented");
+    nx::convert::TranscodeEngine engine;
+    auto result = engine.prepare(translate_to_engine_request(request));
+    
+    if (result.is_success()) {
+        if (request.flags.json_output) {
+            std::cout << "{\n";
+            std::cout << "  \"operation\": \"transcode\",\n";
+            std::cout << "  \"status\": \"prepared\",\n";
+            std::cout << "  \"graph_id\": \"" << result.outcome.graph_id << "\",\n";
+            std::cout << "  \"verification_token\": \"" << result.outcome.verification_token << "\"\n";
+            std::cout << "}\n";
+        } else {
+            std::cout << "Transcode prepared successfully\n";
+            std::cout << "Graph ID: " << result.outcome.graph_id << "\n";
+            std::cout << "Verification: " << result.outcome.verification_token << "\n";
+        }
+        return CliResult::ok();
+    } else {
+        return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "TranscodeEngine rejected request");
+    }
 }
 
 CliResult ConvertCommand::invoke_analyze_engine(const std::string& input_path, bool json_output) {
-    // TODO: Invoke nx::convert::TranscodeEngine::analyze()
-    
     if (json_output) {
         std::cout << "{\n";
         std::cout << "  \"operation\": \"analyze\",\n";
@@ -105,13 +128,10 @@ CliResult ConvertCommand::invoke_analyze_engine(const std::string& input_path, b
         std::cout << "ANALYZE: " << input_path << "\n";
         std::cout << "Status: Not yet implemented\n";
     }
-    
     return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "AnalyzeEngine not yet implemented");
 }
 
 CliResult ConvertCommand::invoke_verify_engine(const std::string& input_path, const std::string& output_path, bool json_output) {
-    // TODO: Invoke nx::convert::TranscodeEngine::verify()
-    
     if (json_output) {
         std::cout << "{\n";
         std::cout << "  \"operation\": \"verify\",\n";
@@ -123,7 +143,6 @@ CliResult ConvertCommand::invoke_verify_engine(const std::string& input_path, co
         std::cout << "VERIFY: " << input_path << " vs " << output_path << "\n";
         std::cout << "Status: Not yet implemented\n";
     }
-    
     return CliResult::error(CliErrorCode::NX_ENGINE_REJECTED, "VerifyEngine not yet implemented");
 }
 
