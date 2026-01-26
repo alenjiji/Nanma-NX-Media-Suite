@@ -99,3 +99,7 @@ This document, together with:
 - Determinism test suites
 
 constitutes architectural law for Nanma NX-MediaSuite.
+----------------------------------------------
+Phase 3.B — Engine Binding / Execution Adapters
+Status: COMPLETE, CERTIFIED, CLOSED
+----------------------------------------------
