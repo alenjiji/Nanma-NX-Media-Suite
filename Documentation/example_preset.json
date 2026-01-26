@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "preset_name": "video_transcode_workflow",
+  "description": "Lossless video transcoding with audio normalization",
+  "jobs": {
+    "extract_audio": {
+      "engine_identifier": "nx-convert-pro",
+      "api_operation": "extract_stream",
+      "parameters_blob": "{\"stream_type\":\"audio\",\"format\":\"wav\",\"sample_rate\":48000}",
+      "input_artifacts": ["source_video.mp4"],
+      "output_artifacts": ["extracted_audio.wav"]
+    },
+    "normalize_audio": {
+      "engine_identifier": "nx-audiolab",
+      "api_operation": "normalize_loudness",
+      "parameters_blob": "{\"target_lufs\":-23.0,\"standard\":\"ITU-R_BS.1770\"}",
+      "input_artifacts": ["extracted_audio.wav"],
+      "output_artifacts": ["normalized_audio.wav"]
+    },
+    "transcode_video": {
+      "engine_identifier": "nx-videotrans",
+      "api_operation": "transcode",
+      "parameters_blob": "{\"codec\":\"prores_422\",\"color_space\":\"rec709\"}",
+      "input_artifacts": ["source_video.mp4"],
+      "output_artifacts": ["transcoded_video.mov"]
+    },
+    "mux_final": {
+      "engine_identifier": "nx-convert-pro",
+      "api_operation": "mux_streams",
+      "parameters_blob": "{\"container\":\"mov\",\"video_track\":0,\"audio_track\":0}",
+      "input_artifacts": ["transcoded_video.mov", "normalized_audio.wav"],
+      "output_artifacts": ["final_output.mov"]
+    }
+  },
+  "dependencies": [
+    {
+      "from_job": "extract_audio",
+      "to_job": "normalize_audio"
+    },
+    {
+      "from_job": "normalize_audio",
+      "to_job": "mux_final"
+    },
+    {
+      "from_job": "transcode_video",
+      "to_job": "mux_final"
+    }
+  ],
+  "retry_policies": {
+    "normalize_audio": {
+      "max_attempts": 3,
+      "retry_delay_ticks": 10,
+      "retry_on_states": ["Failed"]
+    },
+    "transcode_video": {
+      "max_attempts": 2,
+      "retry_delay_ticks": 5,
+      "retry_on_states": ["Failed"]
+    }
+  }
+}

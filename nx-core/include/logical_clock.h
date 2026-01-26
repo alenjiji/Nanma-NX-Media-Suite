@@ -30,24 +30,44 @@ struct LogicalTime final {
     uint64_t ticks;
     
     // Create LogicalTime at origin (tick 0)
-    static LogicalTime origin() noexcept;
+    static LogicalTime origin() noexcept {
+        return LogicalTime{0};
+    }
     
     // Create LogicalTime at specific tick value
-    static LogicalTime at_tick(uint64_t tick) noexcept;
+    static LogicalTime at_tick(uint64_t tick) noexcept {
+        return LogicalTime{tick};
+    }
     
     // Advance time by specified number of ticks (returns new LogicalTime)
-    LogicalTime advance(uint64_t delta_ticks) const noexcept;
+    LogicalTime advance(uint64_t delta_ticks) const noexcept {
+        return LogicalTime{ticks + delta_ticks};
+    }
     
     // Comparison operators for deterministic ordering
     bool operator==(const LogicalTime&) const noexcept = default;
     bool operator!=(const LogicalTime&) const noexcept = default;
-    bool operator<(const LogicalTime& other) const noexcept;
-    bool operator<=(const LogicalTime& other) const noexcept;
-    bool operator>(const LogicalTime& other) const noexcept;
-    bool operator>=(const LogicalTime& other) const noexcept;
+    
+    bool operator<(const LogicalTime& other) const noexcept {
+        return ticks < other.ticks;
+    }
+    
+    bool operator<=(const LogicalTime& other) const noexcept {
+        return ticks <= other.ticks;
+    }
+    
+    bool operator>(const LogicalTime& other) const noexcept {
+        return ticks > other.ticks;
+    }
+    
+    bool operator>=(const LogicalTime& other) const noexcept {
+        return ticks >= other.ticks;
+    }
     
     // Serialization support
-    std::string to_string() const;
+    std::string to_string() const {
+        return "LogicalTime(" + std::to_string(ticks) + ")";
+    }
 };
 
 /**
@@ -62,27 +82,49 @@ struct SequenceIndex final {
     uint64_t index;
     
     // Create SequenceIndex at beginning (index 0)
-    static SequenceIndex first() noexcept;
+    static SequenceIndex first() noexcept {
+        return SequenceIndex{0};
+    }
     
     // Create SequenceIndex at specific position
-    static SequenceIndex at_position(uint64_t position) noexcept;
+    static SequenceIndex at_position(uint64_t position) noexcept {
+        return SequenceIndex{position};
+    }
     
     // Get next sequence position (returns new SequenceIndex)
-    SequenceIndex next() const noexcept;
+    SequenceIndex next() const noexcept {
+        return SequenceIndex{index + 1};
+    }
     
     // Advance sequence by specified steps (returns new SequenceIndex)
-    SequenceIndex advance(uint64_t steps) const noexcept;
+    SequenceIndex advance(uint64_t steps) const noexcept {
+        return SequenceIndex{index + steps};
+    }
     
     // Comparison operators for deterministic ordering
     bool operator==(const SequenceIndex&) const noexcept = default;
     bool operator!=(const SequenceIndex&) const noexcept = default;
-    bool operator<(const SequenceIndex& other) const noexcept;
-    bool operator<=(const SequenceIndex& other) const noexcept;
-    bool operator>(const SequenceIndex& other) const noexcept;
-    bool operator>=(const SequenceIndex& other) const noexcept;
+    
+    bool operator<(const SequenceIndex& other) const noexcept {
+        return index < other.index;
+    }
+    
+    bool operator<=(const SequenceIndex& other) const noexcept {
+        return index <= other.index;
+    }
+    
+    bool operator>(const SequenceIndex& other) const noexcept {
+        return index > other.index;
+    }
+    
+    bool operator>=(const SequenceIndex& other) const noexcept {
+        return index >= other.index;
+    }
     
     // Serialization support
-    std::string to_string() const;
+    std::string to_string() const {
+        return "SequenceIndex(" + std::to_string(index) + ")";
+    }
 };
 
 /**
@@ -97,27 +139,42 @@ struct LogicalClock final {
     LogicalTime current_time;
     
     // Create clock at origin (time 0)
-    static LogicalClock at_origin() noexcept;
+    static LogicalClock at_origin() noexcept {
+        return LogicalClock{LogicalTime::origin()};
+    }
     
     // Create clock at specific time
-    static LogicalClock at_time(LogicalTime time) noexcept;
+    static LogicalClock at_time(LogicalTime time) noexcept {
+        return LogicalClock{time};
+    }
     
     // Advance clock by one tick (returns new LogicalClock)
-    LogicalClock tick() const noexcept;
+    LogicalClock tick() const noexcept {
+        return LogicalClock{current_time.advance(1)};
+    }
     
     // Advance clock by specified ticks (returns new LogicalClock)
-    LogicalClock advance(uint64_t ticks) const noexcept;
+    LogicalClock advance(uint64_t ticks) const noexcept {
+        return LogicalClock{current_time.advance(ticks)};
+    }
     
     // Get current logical time (immutable)
-    LogicalTime now() const noexcept;
+    LogicalTime now() const noexcept {
+        return current_time;
+    }
     
     // Comparison operators
     bool operator==(const LogicalClock&) const noexcept = default;
     bool operator!=(const LogicalClock&) const noexcept = default;
-    bool operator<(const LogicalClock& other) const noexcept;
+    
+    bool operator<(const LogicalClock& other) const noexcept {
+        return current_time < other.current_time;
+    }
     
     // Serialization support
-    std::string to_string() const;
+    std::string to_string() const {
+        return "LogicalClock{" + current_time.to_string() + "}";
+    }
 };
 
 } // namespace nx::core

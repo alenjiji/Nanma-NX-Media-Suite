@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NX-BatchFlow Preset Schema",
+  "description": "Pure data preset format for deterministic workflow execution",
+  "type": "object",
+  "required": ["version", "preset_name", "description", "jobs"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semantic version (major.minor.patch)"
+    },
+    "preset_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable preset identifier"
+    },
+    "description": {
+      "type": "string",
+      "description": "Preset description and purpose"
+    },
+    "jobs": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "type": "object",
+          "required": ["engine_identifier", "api_operation", "parameters_blob"],
+          "additionalProperties": false,
+          "properties": {
+            "engine_identifier": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Target engine name (opaque string)"
+            },
+            "api_operation": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Engine API operation (opaque string)"
+            },
+            "parameters_blob": {
+              "type": "string",
+              "description": "Canonicalized parameters (opaque string)"
+            },
+            "input_artifacts": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Input artifact identifiers"
+            },
+            "output_artifacts": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Output artifact identifiers"
+            }
+          }
+        }
+      },
+      "description": "Job definitions indexed by job name"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from_job", "to_job"],
+        "additionalProperties": false,
+        "properties": {
+          "from_job": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Job that must complete first"
+          },
+          "to_job": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Job that depends on from_job"
+          }
+        }
+      },
+      "description": "Dependency relationships between jobs"
+    },
+    "retry_policies": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "type": "object",
+          "required": ["max_attempts", "retry_delay_ticks"],
+          "additionalProperties": false,
+          "properties": {
+            "max_attempts": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Maximum total attempts including original"
+            },
+            "retry_delay_ticks": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Fixed delay in logical clock ticks"
+            },
+            "retry_on_states": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["Failed"]
+              },
+              "description": "Job states that trigger retry evaluation"
+            }
+          }
+        }
+      },
+      "description": "Retry policies indexed by job name"
+    }
+  }
+}
