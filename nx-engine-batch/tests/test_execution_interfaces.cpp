@@ -78,18 +78,20 @@ void test_job_execution_result_structure() {
     SessionJobId job_id{session_id, "job-001"};
     
     JobExecutionResult result{
-        .job_id = job_id,
+        .success = true,
+        .message = "Test execution",
         .result_token = "execution-token-123"
     };
     
-    assert(result.job_id == job_id);
+    assert(result.success == true);
+    assert(result.message == "Test execution");
     assert(result.result_token == "execution-token-123");
     
     // Test equality
-    JobExecutionResult result2{job_id, "execution-token-123"};
+    JobExecutionResult result2{true, "Test execution", "execution-token-123"};
     assert(result == result2);
     
-    JobExecutionResult result3{job_id, "different-token"};
+    JobExecutionResult result3{true, "Test execution", "different-token"};
     assert(!(result == result3));
 }
 
