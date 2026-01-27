@@ -14,7 +14,7 @@ std::vector<JobSummary> NullMonitorEngine::jobs() const {
     return {};
 }
 
-std::optional<JobDetail> NullMonitorEngine::job(const std::string& job_id) const {
+std::optional<JobDetail> NullMonitorEngine::job(const std::string& /* job_id */) const {
     return std::nullopt;
 }
 
