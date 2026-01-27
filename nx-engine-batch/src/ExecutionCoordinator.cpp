@@ -7,11 +7,11 @@ std::vector<JobExecutionSpec> ExecutionCoordinator::prepare_job_specs(const Batc
     std::vector<JobExecutionSpec> specs;
     
     for (const auto& job : session.jobs()) {
-        specs.push_back(JobExecutionSpec{
-            .job_id = job.job_id,       // REFERENCED: Job identity from session
-            .command = job.command,     // COPIED: Command string from session
-            .arguments = job.arguments  // COPIED: Arguments from session
-        });
+        specs.push_back(JobExecutionSpec::create(
+            ComponentType::Convert,  // Default to Convert for Phase 9
+            job.command,
+            job.arguments
+        ));
     }
     
     return specs;
@@ -23,11 +23,11 @@ std::optional<JobExecutionSpec> ExecutionCoordinator::prepare_job_spec(const Bat
         return std::nullopt;
     }
     
-    return JobExecutionSpec{
-        .job_id = job->job_id,       // REFERENCED: Job identity from session
-        .command = job->command,     // COPIED: Command string from session
-        .arguments = job->arguments  // COPIED: Arguments from session
-    };
+    return JobExecutionSpec::create(
+        ComponentType::Convert,  // Default to Convert for Phase 9
+        job->command,
+        job->arguments
+    );
 }
 
 } // namespace nx::batch
