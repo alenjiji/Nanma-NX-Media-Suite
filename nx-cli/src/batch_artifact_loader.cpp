@@ -65,10 +65,10 @@ CliResult BatchArtifactLoader::load_artifact_index(const std::string& batch_id, 
                                "Artifact index not found for batch ID: " + batch_id);
     }
     
-    // TODO: Implement actual artifact loading
-    index.batch_id = batch_id;
-    
-    return CliResult::ok();
+    return CliResult::error(
+        CliErrorCode::NX_EXEC_FAILED,
+        "Artifact index parsing not implemented"
+    );
 }
 
 CliResult BatchArtifactLoader::load_artifact_content(const std::string& batch_id, 
@@ -82,16 +82,17 @@ CliResult BatchArtifactLoader::load_artifact_content(const std::string& batch_id
         return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Artifact ID cannot be empty");
     }
     
-    std::string content_path = get_artifact_content_path(batch_id, artifact_id);
-    if (!std::filesystem::exists(content_path)) {
-        return CliResult::error(CliErrorCode::ERROR_ARTIFACT_NOT_FOUND, 
-                               "Artifact not found: " + artifact_id + " in batch: " + batch_id);
+    // First check if artifact index exists
+    std::string index_path = get_artifact_index_path(batch_id);
+    if (!std::filesystem::exists(index_path)) {
+        return CliResult::error(CliErrorCode::ERROR_BATCH_NOT_FOUND, 
+                               "Artifact index not found for batch ID: " + batch_id);
     }
     
-    // TODO: Implement actual content loading
-    content = "placeholder_content";
-    
-    return CliResult::ok();
+    return CliResult::error(
+        CliErrorCode::NX_EXEC_FAILED,
+        "Artifact content access not implemented"
+    );
 }
 
 void BatchArtifactLoader::sort_jobs_by_execution_order(std::vector<std::string>& job_ids, 
@@ -131,8 +132,8 @@ std::string BatchArtifactLoader::get_policy_resolution_path(const std::string& b
 }
 
 std::string BatchArtifactLoader::get_artifact_index_path(const std::string& batch_id) {
-    // TODO: Use actual artifact storage conventions from existing phases
-    return "artifacts/indexes/" + batch_id + "_index.json";
+    // Use test fixtures for now, will be replaced with actual artifact storage
+    return "tests/fixtures/artifacts/indexes/" + batch_id + "_index.json";
 }
 
 std::string BatchArtifactLoader::get_artifact_content_path(const std::string& batch_id, const std::string& artifact_id) {

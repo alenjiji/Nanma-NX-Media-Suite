@@ -435,14 +435,119 @@ CliResult BatchIntrospectionCommand::handle_policies(const std::vector<std::stri
 }
 
 CliResult BatchIntrospectionCommand::handle_artifacts(const std::vector<std::string>& args) {
-    // TODO: Implement artifacts introspection
-    output_json("{\"error\": \"Not implemented\", \"subcommand\": \"artifacts\"}");
+    BatchInspectArtifactsRequest request;
+    auto parse_result = parse_artifacts_args(args, request);
+    if (!parse_result.success) {
+        return parse_result;
+    }
+    
+    // Load artifact index
+    BatchArtifactIndex index;
+    auto load_result = BatchArtifactLoader::load_artifact_index(request.batch_id, index);
+    if (!load_result.success) {
+        return load_result;
+    }
+    
+    // Apply filtering
+    std::vector<ArtifactMetadata> filtered_artifacts = index.artifacts;
+    
+    // Filter by artifact_type if specified
+    if (!request.flags.artifact_type.empty()) {
+        std::vector<ArtifactMetadata> temp_artifacts;
+        for (const auto& artifact : filtered_artifacts) {
+            if (artifact.artifact_type == request.flags.artifact_type) {
+                temp_artifacts.push_back(artifact);
+            }
+        }
+        filtered_artifacts = temp_artifacts;
+    }
+    
+    // Filter by job_id if specified
+    if (!request.flags.job_id.empty()) {
+        std::vector<ArtifactMetadata> temp_artifacts;
+        for (const auto& artifact : filtered_artifacts) {
+            if (artifact.job_id == request.flags.job_id) {
+                temp_artifacts.push_back(artifact);
+            }
+        }
+        filtered_artifacts = temp_artifacts;
+    }
+    
+    // Sort deterministically by job_id, artifact_type, artifact_id
+    std::sort(filtered_artifacts.begin(), filtered_artifacts.end(), 
+              [](const ArtifactMetadata& a, const ArtifactMetadata& b) {
+                  if (a.job_id != b.job_id) {
+                      return a.job_id < b.job_id;
+                  }
+                  if (a.artifact_type != b.artifact_type) {
+                      return a.artifact_type < b.artifact_type;
+                  }
+                  return a.artifact_id < b.artifact_id;
+              });
+    
+    // Generate JSON output according to contract schema
+    std::string json = "{\n";
+    json += "  \"batch_id\": \"" + escape_json_string(index.batch_id) + "\",\n";
+    json += "  \"artifacts\": [\n";
+    
+    for (size_t i = 0; i < filtered_artifacts.size(); ++i) {
+        const auto& artifact = filtered_artifacts[i];
+        
+        json += "    {\n";
+        json += "      \"artifact_id\": \"" + escape_json_string(artifact.artifact_id) + "\",\n";
+        json += "      \"artifact_type\": \"" + escape_json_string(artifact.artifact_type) + "\",\n";
+        json += "      \"job_id\": \"" + escape_json_string(artifact.job_id) + "\",\n";
+        json += "      \"size_bytes\": " + std::to_string(artifact.size_bytes) + ",\n";
+        json += "      \"created_timestamp\": \"" + escape_json_string(artifact.created_timestamp) + "\",\n";
+        json += "      \"content_hash\": \"" + escape_json_string(artifact.content_hash) + "\"\n";
+        json += "    }";
+        if (i < filtered_artifacts.size() - 1) json += ",";
+        json += "\n";
+    }
+    
+    json += "  ]\n";
+    json += "}";
+    
+    output_json(json);
     return CliResult::ok();
 }
 
 CliResult BatchIntrospectionCommand::handle_artifact(const std::vector<std::string>& args) {
-    // TODO: Implement artifact content introspection
-    output_json("{\"error\": \"Not implemented\", \"subcommand\": \"artifact\"}");
+    BatchInspectArtifactRequest request;
+    auto parse_result = parse_artifact_args(args, request);
+    if (!parse_result.success) {
+        return parse_result;
+    }
+    
+    // Load artifact index to validate artifact exists
+    BatchArtifactIndex index;
+    auto load_result = BatchArtifactLoader::load_artifact_index(request.batch_id, index);
+    if (!load_result.success) {
+        return load_result;
+    }
+    
+    // Find the specific artifact in the index
+    bool artifact_found = false;
+    for (const auto& artifact : index.artifacts) {
+        if (artifact.artifact_id == request.artifact_id) {
+            artifact_found = true;
+            break;
+        }
+    }
+    
+    if (!artifact_found) {
+        return CliResult::error(CliErrorCode::ERROR_ARTIFACT_NOT_FOUND, 
+                               "Artifact not found: " + request.artifact_id + " in batch: " + request.batch_id);
+    }
+    
+    // Attempt to load artifact content (will fail with NX_EXEC_FAILED)
+    std::string content;
+    auto content_result = BatchArtifactLoader::load_artifact_content(request.batch_id, request.artifact_id, content);
+    if (!content_result.success) {
+        return content_result;
+    }
+    
+    // This should never be reached due to fail-fast implementation
     return CliResult::ok();
 }
 
@@ -635,13 +740,84 @@ CliResult BatchIntrospectionCommand::parse_policies_args(const std::vector<std::
 }
 
 CliResult BatchIntrospectionCommand::parse_artifacts_args(const std::vector<std::string>& args, BatchInspectArtifactsRequest& request) {
-    // TODO: Implement argument parsing
-    return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Argument parsing not implemented");
+    if (args.empty()) {
+        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Missing required batch_id");
+    }
+    
+    request.batch_id = args[0];
+    
+    // Parse flags
+    for (size_t i = 1; i < args.size(); ++i) {
+        const std::string& arg = args[i];
+        
+        if (arg == "--artifact-type") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--artifact-type requires value");
+            }
+            const std::string& type = args[++i];
+            if (type != "report" && type != "validation" && type != "hash" && type != "timeline" && type != "log") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid artifact-type: " + type + ". Must be report|validation|hash|timeline|log");
+            }
+            request.flags.artifact_type = type;
+        } else if (arg == "--job-id") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--job-id requires value");
+            }
+            request.flags.job_id = args[++i];
+        } else if (arg == "--format") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--format requires value");
+            }
+            const std::string& format = args[++i];
+            if (format != "json" && format != "human") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid format: " + format + ". Must be json|human");
+            }
+            // JSON is default, no need to store format preference for now
+        } else {
+            return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Unknown flag: " + arg);
+        }
+    }
+    
+    return CliResult::ok();
 }
 
 CliResult BatchIntrospectionCommand::parse_artifact_args(const std::vector<std::string>& args, BatchInspectArtifactRequest& request) {
-    // TODO: Implement argument parsing
-    return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Argument parsing not implemented");
+    if (args.size() < 2) {
+        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Missing required batch_id and artifact_id");
+    }
+    
+    request.batch_id = args[0];
+    request.artifact_id = args[1];
+    
+    // Parse flags
+    for (size_t i = 2; i < args.size(); ++i) {
+        const std::string& arg = args[i];
+        
+        if (arg == "--format") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--format requires value");
+            }
+            const std::string& format = args[++i];
+            if (format != "json" && format != "raw") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid format: " + format + ". Must be json|raw");
+            }
+            request.flags.json_output = (format == "json");
+        } else if (arg == "--max-size") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--max-size requires value");
+            }
+            const std::string& size_str = args[++i];
+            try {
+                request.flags.max_size = std::stoull(size_str);
+            } catch (const std::exception&) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Invalid max-size value: " + size_str);
+            }
+        } else {
+            return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Unknown flag: " + arg);
+        }
+    }
+    
+    return CliResult::ok();
 }
 
 void BatchIntrospectionCommand::output_json(const std::string& json_content) {

@@ -1,0 +1,37 @@
+{
+  "batch_id": "test_batch_001",
+  "artifacts": [
+    {
+      "artifact_id": "report_001",
+      "artifact_type": "report",
+      "job_id": "job_001",
+      "size_bytes": 1024,
+      "created_timestamp": "2024-01-15T10:30:00Z",
+      "content_hash": "sha256:abc123"
+    },
+    {
+      "artifact_id": "validation_001",
+      "artifact_type": "validation",
+      "job_id": "job_001",
+      "size_bytes": 512,
+      "created_timestamp": "2024-01-15T10:30:01Z",
+      "content_hash": "sha256:def456"
+    },
+    {
+      "artifact_id": "timeline_002",
+      "artifact_type": "timeline",
+      "job_id": "job_002",
+      "size_bytes": 2048,
+      "created_timestamp": "2024-01-15T10:30:02Z",
+      "content_hash": "sha256:ghi789"
+    },
+    {
+      "artifact_id": "log_003",
+      "artifact_type": "log",
+      "job_id": "job_003",
+      "size_bytes": 4096,
+      "created_timestamp": "2024-01-15T10:30:03Z",
+      "content_hash": "sha256:jkl012"
+    }
+  ]
+}
