@@ -15,6 +15,7 @@ set(BATCH_ENGINE_SOURCES
     src/BatchEngineImpl.cpp
     src/BatchPlanSession.cpp
     src/SessionTypes.cpp
+    src/JobExecutionSpec.cpp
     src/ExecutionInput.cpp
     src/ExecutionGraph.cpp
     src/ExecutionCoordinator.cpp
