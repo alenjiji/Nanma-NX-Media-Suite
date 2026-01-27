@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cstring>
+#include <vector>
 
 // Simple SHA-256 implementation for deterministic hashing
 // Platform-independent, no external dependencies
