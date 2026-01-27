@@ -26,7 +26,7 @@ This roadmap governs **core system architecture** only. Codec quality, DSP algor
 * No engine dependencies
 * CI-stable golden outputs
 
-**Status:** ✅ Complete
+**Status:** ✅ Complete & Locked
 **Rule:** MUST NOT CHANGE
 
 ---
@@ -114,11 +114,11 @@ Introduce **job identity & lifecycle ownership** without execution.
 
 ---
 
-## ⚙️ PHASE GROUP E — EXECUTION (CORE COMPLETION) (Progress)
+## ⚙️ PHASE GROUP E — EXECUTION (CORE COMPLETION)
 
-> **Status: COMPLETED**
+> **Status: COMPLETE & LOCKED**
 
-### Phase 8 — Execution Engine (Synchronous) (Progress)
+### Phase 8 — Execution Engine (Synchronous)
 
 **Goal:**
 Execute planned jobs deterministically.
@@ -132,6 +132,8 @@ Execute planned jobs deterministically.
 
 * Jobs transition: `planned → running → completed/failed`
 
+**Status:** ✅ Complete & Locked
+
 ---
 
 ### Phase 9 — Job Lifecycle & State Model
@@ -144,7 +146,9 @@ Formalize job state transitions.
 * Deterministic transitions
 * CI-testable lifecycle
 
-> 🚩 **At the end of Phase 9, the system is functionally complete (v1).**
+**Status:** ✅ Complete & Locked
+
+> 🚩 **Phase 9 Complete: The system is functionally complete (v1).**
 
 ---
 
@@ -178,7 +182,7 @@ These phases **must not** change earlier contracts.
 
 ### ✅ v1 Completion (Production-Ready)
 
-* Through **Phase 9**
+* Through **Phase 9** ✅ **ACHIEVED**
 * Deterministic
 * Observable
 * Executable
