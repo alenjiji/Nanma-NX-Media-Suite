@@ -5,15 +5,15 @@
 
 namespace nx::cli {
 
-static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioMeasureRequest& cli_request) {
+static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioMeasureRequest& /* cli_request */) {
     return nx::audio::AudioRequest{};
 }
 
-static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioProcessRequest& cli_request) {
+static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioProcessRequest& /* cli_request */) {
     return nx::audio::AudioRequest{};
 }
 
-static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioVerifyRequest& cli_request) {
+static nx::audio::AudioRequest translate_to_audio_engine_request(const AudioVerifyRequest& /* cli_request */) {
     return nx::audio::AudioRequest{};
 }
 
