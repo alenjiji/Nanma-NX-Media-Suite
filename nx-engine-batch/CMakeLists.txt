@@ -13,11 +13,20 @@ include_directories(include)
 # Source files
 set(BATCH_ENGINE_SOURCES
     src/BatchEngineImpl.cpp
+    src/BatchPlanSession.cpp
+    src/ExecutionInput.cpp
+    src/ExecutionGraph.cpp
+    src/ExecutionCoordinator.cpp
 )
 
 # Batch Engine Library
 add_library(nx-engine-batch ${BATCH_ENGINE_SOURCES})
 target_include_directories(nx-engine-batch PUBLIC include)
+
+# Dependencies
+target_include_directories(nx-engine-batch PRIVATE 
+    ${CMAKE_SOURCE_DIR}/nx-core/include
+)
 
 # Compiler warnings
 if(MSVC)

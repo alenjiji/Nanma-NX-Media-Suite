@@ -15,7 +15,7 @@ nx::core::Result<MetaRepairRequest> parse_meta_repair_request(
     
     // For now, fail with explicit message about missing implementation
     return nx::core::fail<MetaRepairRequest>(
-        nx::core::ErrorCode::NotImplemented,
+        nx::core::ErrorCode::InvalidInput,
         nx::core::ErrorSeverity::Error,
         "parse_meta_repair_request: Phase 1.A stub - parsing not implemented"
     );

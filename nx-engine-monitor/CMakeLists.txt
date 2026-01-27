@@ -14,11 +14,17 @@ include_directories(include)
 set(MONITOR_ENGINE_SOURCES
     src/NullMonitorEngine.cpp
     src/RealMonitorEngine.cpp
+    src/ExecutionBoundaryObserver.cpp
 )
 
 # Monitor Engine Library
 add_library(nx-engine-monitor ${MONITOR_ENGINE_SOURCES})
 target_include_directories(nx-engine-monitor PUBLIC include)
+
+# Dependencies
+target_include_directories(nx-engine-monitor PRIVATE 
+    ${CMAKE_SOURCE_DIR}/nx-engine-batch/include
+)
 
 # Compiler warnings
 if(MSVC)

@@ -84,11 +84,7 @@ This roadmap governs **core system architecture** only. Codec quality, DSP algor
 
 ---
 
-## 🧠 PHASE GROUP D — SESSION OWNERSHIP (NEXT)
-
-> **Status: NOT STARTED**
-
-### Phase 7 — BatchPlan Session Architecture
+### Phase 7 — BatchPlan Session Architecture (Completed)
 
 **Goal:**
 Introduce **job identity & lifecycle ownership** without execution.
@@ -114,15 +110,15 @@ Introduce **job identity & lifecycle ownership** without execution.
 * No clocks
 * No persistence
 
-**Status:** ⏳ NEXT
+**Status:** Completed
 
 ---
 
-## ⚙️ PHASE GROUP E — EXECUTION (CORE COMPLETION)
+## ⚙️ PHASE GROUP E — EXECUTION (CORE COMPLETION) (Progress)
 
-> **Status: NOT STARTED**
+> **Status: COMPLETED**
 
-### Phase 8 — Execution Engine (Synchronous)
+### Phase 8 — Execution Engine (Synchronous) (Progress)
 
 **Goal:**
 Execute planned jobs deterministically.

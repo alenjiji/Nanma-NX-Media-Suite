@@ -1,9 +1,21 @@
 cmake_minimum_required(VERSION 3.20)
 
-# Test executable
+# Test executables
 add_executable(test_batch_engine test_batch_engine.cpp)
 target_link_libraries(test_batch_engine nx-engine-batch)
 
-# Add test to CTest
+add_executable(test_session_architecture test_session_architecture.cpp)
+target_link_libraries(test_session_architecture nx-engine-batch)
+
+add_executable(test_execution_interfaces test_execution_interfaces.cpp)
+target_link_libraries(test_execution_interfaces nx-engine-batch)
+
+add_executable(test_execution_result_envelope test_execution_result_envelope.cpp)
+target_link_libraries(test_execution_result_envelope nx-engine-batch)
+
+# Add tests to CTest
 enable_testing()
 add_test(NAME batch_engine_tests COMMAND test_batch_engine)
+add_test(NAME session_architecture_tests COMMAND test_session_architecture)
+add_test(NAME execution_interfaces_tests COMMAND test_execution_interfaces)
+add_test(NAME execution_result_envelope_tests COMMAND test_execution_result_envelope)

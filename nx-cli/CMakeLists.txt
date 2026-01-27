@@ -31,18 +31,15 @@ set(CLI_SOURCES
 add_library(nx-cli-lib ${CLI_SOURCES})
 target_include_directories(nx-cli-lib PUBLIC include)
 
-# Engine dependencies (as subdirectories)
-add_subdirectory(../nx-core nx-core)
-add_subdirectory(../nx-engine-convert nx-engine-convert)
-add_subdirectory(../nx-engine-audio nx-engine-audio)
-add_subdirectory(../nx-engine-video nx-engine-video)
-add_subdirectory(../nx-engine-monitor nx-engine-monitor)
+# Engine dependencies (link to existing targets)
+# All engines are already added by root CMakeLists.txt
 
 # Link engines
 target_link_libraries(nx-cli-lib 
     nx-engine-convert
     nx-engine-audio
     nx-engine-video
+    nx-engine-meta
     nx-engine-monitor
 )
 
