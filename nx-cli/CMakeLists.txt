@@ -16,6 +16,7 @@ add_library(nx-cli-lib
     src/batch_artifact_loader.cpp
     src/batch_introspection_command.cpp
     src/audio_argument_parser.cpp
+    src/batch_argument_parser.cpp
 )
 
 target_include_directories(nx-cli-lib PUBLIC include)
