@@ -8,14 +8,14 @@ struct GraphNode final {
     NodeId id;
     GraphNodeType type;
 
-    constexpr bool operator==(const GraphNode&) const = default;
+    bool operator==(const GraphNode&) const = default;
 };
 
 struct TranscodeGraph final {
     GraphId id;
     std::vector<GraphNode> nodes;
 
-    constexpr bool operator==(const TranscodeGraph&) const = default;
+    bool operator==(const TranscodeGraph&) const = default;
 };
 
 }
