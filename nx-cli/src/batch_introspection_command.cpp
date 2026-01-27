@@ -252,7 +252,9 @@ CliResult BatchIntrospectionCommand::handle_status(const std::vector<std::string
     // Generate JSON output according to contract schema
     std::string json = "{\n";
     json += "  \"batch_id\": \"" + escape_json_string(execution.batch_id) + "\",\n";
-    json += "  \"execution_complete\": " + (execution.execution_complete ? "true" : "false") + ",\n";
+    json += "  \"execution_complete\": ";
+    json += (execution.execution_complete ? "true" : "false");
+    json += ",\n";
     json += "  \"job_states\": [\n";
     
     for (size_t i = 0; i < filtered_states.size(); ++i) {
