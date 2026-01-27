@@ -177,7 +177,7 @@ public:
     JobExecutionResult execute_retry(
         const JobExecutionSpec& intent,
         const RetryAttempt& attempt
-    ) override;
+    );
     
 private:
     std::unordered_map<uint32_t, ExecutionOutcome> forced_outcomes_;  // OWNED: Forced outcomes for testing
