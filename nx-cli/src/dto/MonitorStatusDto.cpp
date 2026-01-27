@@ -1,4 +1,5 @@
 #include "MonitorStatusDto.h"
+#include "nx/monitor/MonitorEngine.h"
 
 namespace nx::cli::dto {
 
