@@ -2,6 +2,7 @@
 
 #include "SessionTypes.h"
 #include "JobExecutionResult.h"
+#include "ExecutionGraph.h"
 #include <vector>
 #include <optional>
 
@@ -199,8 +200,20 @@ public:
      */
     bool all_jobs_terminal() const noexcept;
 
+    /**
+     * Get reference to execution graph for intent-execution bridge
+     * 
+     * PHASE 9 BRIDGE:
+     * - Provides access to ExecutionGraph for JobExecutionSpec lookup
+     * - Enables mapping from SessionJobId to JobExecutionSpec
+     * 
+     * @return Reference to the execution graph
+     */
+    const ExecutionGraph& get_execution_graph() const noexcept;
+    
 private:
     std::vector<ExecutionJobState> job_states_;  // OWNED: All job states in deterministic order
+    const ExecutionGraph* execution_graph_;      // REFERENCED: Graph for intent-execution bridge
     
     // Find job state index by job_id
     size_t find_job_index(const SessionJobId& job_id) const;

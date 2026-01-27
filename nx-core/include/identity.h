@@ -34,12 +34,12 @@ public:
     // Serialization support
     std::string to_string() const;
     const HashBytes& bytes() const noexcept { return hash_; }
+    
+    // Compute SHA-256 hash of input data (public for external use)
+    static HashBytes compute_hash(std::string_view input);
 
 protected:
     explicit Identity(const HashBytes& hash) : hash_(hash) {}
-    
-    // Compute SHA-256 hash of input data
-    static HashBytes compute_hash(std::string_view input);
     
 private:
     HashBytes hash_;

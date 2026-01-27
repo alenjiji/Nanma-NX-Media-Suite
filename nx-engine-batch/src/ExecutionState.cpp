@@ -58,7 +58,8 @@ bool ExecutionJobState::is_terminal() const noexcept {
 
 // ExecutionStateStore implementation
 
-ExecutionStateStore::ExecutionStateStore(const ExecutionGraph& execution_graph) {
+ExecutionStateStore::ExecutionStateStore(const ExecutionGraph& execution_graph)
+    : execution_graph_(&execution_graph) {
     // Initialize all jobs in Planned state with deterministic ordering
     const auto& nodes = execution_graph.nodes();
     job_states_.reserve(nodes.size());
@@ -149,6 +150,10 @@ bool ExecutionStateStore::is_valid_transition(ExecutionState from, ExecutionStat
             return false;  // Terminal states - no further transitions allowed
     }
     return false;
+}
+
+const ExecutionGraph& ExecutionStateStore::get_execution_graph() const noexcept {
+    return *execution_graph_;
 }
 
 } // namespace nx::batch

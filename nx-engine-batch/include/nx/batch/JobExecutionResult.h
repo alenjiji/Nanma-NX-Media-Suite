@@ -1,6 +1,5 @@
 #pragma once
 
-#include "SessionTypes.h"
 #include <string>
 
 namespace nx::batch {
@@ -8,12 +7,15 @@ namespace nx::batch {
 /**
  * Result descriptor for job execution
  * 
- * Contains only the minimal information about execution completion.
- * No success/failure semantics - just execution metadata.
+ * PHASE 9 COMPLIANCE:
+ * - Contains only execution result information, not identity
+ * - JobExecutor operates on JobExecutionSpec (intent), returns execution result
+ * - SessionJobId (execution identity) is managed by execution engine, not executor
  */
 struct JobExecutionResult {
-    SessionJobId job_id;        // REFERENCED: Job that was executed
-    std::string result_token;   // OPAQUE: Execution result identifier
+    bool success;               // OWNED: Execution success/failure
+    std::string message;        // OWNED: Execution result message
+    std::string result_token;   // OWNED: Opaque execution result identifier
     
     bool operator==(const JobExecutionResult& other) const = default;
 };

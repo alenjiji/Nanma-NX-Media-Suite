@@ -5,6 +5,7 @@
 #include "JobExecutor.h"
 #include <vector>
 #include <functional>
+#include <memory>
 
 namespace nx::batch {
 
@@ -178,34 +179,6 @@ private:
 };
 
 /**
- * Job execution interface for deterministic engine
- * 
- * EXECUTION CONSTRAINTS:
- * - Must be deterministic (same inputs → same outputs)
- * - Must not mutate ExecutionStateStore
- * - Must not affect execution order
- * - May use internal threading but must not affect determinism
- */
-class JobExecutor {
-public:
-    virtual ~JobExecutor() = default;
-    
-    /**
-     * Execute job payload
-     * 
-     * DETERMINISM REQUIREMENTS:
-     * - Same job_id and inputs must produce identical results
-     * - No side effects on execution state
-     * - No time-dependent or random behavior
-     * - Hardware-independent results
-     * 
-     * @param job_id Job to execute
-     * @return Execution result for state transition
-     */
-    virtual JobExecutionResult execute_job(const SessionJobId& job_id) = 0;
-};
-
-/**
  * Stub job executor for testing and Phase 8.2 validation
  * 
  * DETERMINISTIC BEHAVIOR:
@@ -215,7 +188,7 @@ public:
  */
 class StubJobExecutor : public JobExecutor {
 public:
-    JobExecutionResult execute_job(const SessionJobId& job_id) override;
+    JobExecutionResult execute_job(const JobExecutionSpec& spec) const override;
 };
 
 } // namespace nx::batch

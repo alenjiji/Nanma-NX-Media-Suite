@@ -16,7 +16,7 @@ DeterministicExecutionEngine::DeterministicExecutionEngine(
     , job_executor_(std::move(job_executor))
     , observer_(observer)
     , current_execution_index_(0)
-    , session_id_(execution_graph.nodes().empty() ? SessionId{""} : execution_graph.nodes()[0].job_id.session_id) {
+    , session_id_(execution_graph.nodes().empty() ? SessionId{""} : execution_graph.nodes()[0].job_id.session) {
     
     NX_DETERMINISTIC_FUNCTION;
     nx::core::DeterminismGuard::assert_no_time_access();
@@ -106,7 +106,13 @@ bool DeterministicExecutionEngine::execute_single_job(const SessionJobId& job_id
     record_state_transition(job_id, ExecutionState::Planned, ExecutionState::Running);
     
     // Phase 2: Job Execution
-    JobExecutionResult execution_result = job_executor_->execute_job(job_id);
+    // PHASE 9 BRIDGE: Map from SessionJobId to JobExecutionSpec
+    auto spec_opt = state_store_.get_execution_graph().get_spec(job_id);
+    if (!spec_opt) {
+        throw std::logic_error("JobExecutionSpec not found for SessionJobId");
+    }
+    
+    JobExecutionResult execution_result = job_executor_->execute_job(spec_opt.value());
     
     // Phase 3: State Transition Running → Terminal
     const auto& running_job_state = state_store_.get_job_state(job_id);
@@ -170,16 +176,17 @@ void DeterministicExecutionEngine::notify_execution_halt(const SessionJobId& fai
 
 // StubJobExecutor implementation
 
-JobExecutionResult StubJobExecutor::execute_job(const SessionJobId& job_id) {
+JobExecutionResult StubJobExecutor::execute_job(const JobExecutionSpec& spec) const {
     NX_DETERMINISTIC_FUNCTION;
     nx::core::DeterminismGuard::assert_no_time_access();
     nx::core::DeterminismGuard::assert_no_random_access();
     
     // Deterministic stub execution - always succeeds for Phase 8.2
+    // Uses spec hash for deterministic behavior
     return JobExecutionResult{
-        .job_id = job_id,
         .success = true,
-        .message = "Stub execution completed successfully"
+        .message = "Stub execution completed successfully",
+        .result_token = "stub_result_" + spec.hash.value
     };
 }
 
