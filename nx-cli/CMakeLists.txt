@@ -19,6 +19,7 @@ add_library(nx-cli-lib
 
 target_include_directories(nx-cli-lib PUBLIC include)
 target_include_directories(nx-cli-lib PRIVATE src)
+target_link_libraries(nx-cli-lib PRIVATE nx-engine-monitor)
 
 add_executable(nx-cli
     src/main.cpp
