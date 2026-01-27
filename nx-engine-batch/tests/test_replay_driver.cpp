@@ -104,7 +104,7 @@ void test_replay_does_not_skip_execution_based_on_past_outcomes() {
     public:
         mutable int execution_count = 0;
         
-        JobExecutionResult execute_retry(const JobExecutionSpec& intent, const RetryAttempt& attempt) const override {
+        JobExecutionResult execute_retry(const JobExecutionSpec& intent, const RetryAttempt& attempt) const {
             execution_count++;
             return RetryExecutor::execute_retry(intent, attempt);
         }
