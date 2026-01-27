@@ -361,8 +361,76 @@ CliResult BatchIntrospectionCommand::handle_job(const std::vector<std::string>& 
 }
 
 CliResult BatchIntrospectionCommand::handle_policies(const std::vector<std::string>& args) {
-    // TODO: Implement policies introspection
-    output_json("{\"error\": \"Not implemented\", \"subcommand\": \"policies\"}");
+    BatchInspectPoliciesRequest request;
+    auto parse_result = parse_policies_args(args, request);
+    if (!parse_result.success) {
+        return parse_result;
+    }
+    
+    // Load policy resolution artifact
+    BatchPolicyArtifact policies;
+    auto load_result = BatchArtifactLoader::load_policy_resolutions(request.batch_id, policies);
+    if (!load_result.success) {
+        return load_result;
+    }
+    
+    // Apply filtering
+    std::vector<PolicyResolution> filtered_resolutions = policies.policy_resolutions;
+    
+    // Filter by job_id if specified
+    if (!request.flags.job_id.empty()) {
+        std::vector<PolicyResolution> temp_resolutions;
+        for (const auto& resolution : filtered_resolutions) {
+            if (resolution.job_id == request.flags.job_id) {
+                temp_resolutions.push_back(resolution);
+            }
+        }
+        filtered_resolutions = temp_resolutions;
+    }
+    
+    // Filter by policy_type if specified
+    if (!request.flags.policy_type.empty()) {
+        std::vector<PolicyResolution> temp_resolutions;
+        for (const auto& resolution : filtered_resolutions) {
+            if (resolution.policy_type == request.flags.policy_type) {
+                temp_resolutions.push_back(resolution);
+            }
+        }
+        filtered_resolutions = temp_resolutions;
+    }
+    
+    // Sort deterministically by job_id, then policy_type
+    std::sort(filtered_resolutions.begin(), filtered_resolutions.end(), 
+              [](const PolicyResolution& a, const PolicyResolution& b) {
+                  if (a.job_id != b.job_id) {
+                      return a.job_id < b.job_id;
+                  }
+                  return a.policy_type < b.policy_type;
+              });
+    
+    // Generate JSON output according to contract schema
+    std::string json = "{\n";
+    json += "  \"batch_id\": \"" + escape_json_string(policies.batch_id) + "\",\n";
+    json += "  \"policy_resolutions\": [\n";
+    
+    for (size_t i = 0; i < filtered_resolutions.size(); ++i) {
+        const auto& resolution = filtered_resolutions[i];
+        
+        json += "    {\n";
+        json += "      \"job_id\": \"" + escape_json_string(resolution.job_id) + "\",\n";
+        json += "      \"policy_type\": \"" + escape_json_string(resolution.policy_type) + "\",\n";
+        json += "      \"policy_applied\": \"" + escape_json_string(resolution.policy_applied) + "\",\n";
+        json += "      \"resolved_decision\": " + resolution.resolved_decision + ",\n";
+        json += "      \"resolution_timestamp\": \"" + escape_json_string(resolution.resolution_timestamp) + "\"\n";
+        json += "    }";
+        if (i < filtered_resolutions.size() - 1) json += ",";
+        json += "\n";
+    }
+    
+    json += "  ]\n";
+    json += "}";
+    
+    output_json(json);
     return CliResult::ok();
 }
 
@@ -525,8 +593,45 @@ CliResult BatchIntrospectionCommand::parse_job_args(const std::vector<std::strin
 }
 
 CliResult BatchIntrospectionCommand::parse_policies_args(const std::vector<std::string>& args, BatchInspectPoliciesRequest& request) {
-    // TODO: Implement argument parsing
-    return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Argument parsing not implemented");
+    if (args.empty()) {
+        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Missing required batch_id");
+    }
+    
+    request.batch_id = args[0];
+    
+    // Parse flags
+    for (size_t i = 1; i < args.size(); ++i) {
+        const std::string& arg = args[i];
+        
+        if (arg == "--job-id") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--job-id requires value");
+            }
+            request.flags.job_id = args[++i];
+        } else if (arg == "--policy-type") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--policy-type requires value");
+            }
+            const std::string& policy_type = args[++i];
+            if (policy_type != "retry" && policy_type != "failure" && policy_type != "execution") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid policy-type: " + policy_type + ". Must be retry|failure|execution");
+            }
+            request.flags.policy_type = policy_type;
+        } else if (arg == "--format") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--format requires value");
+            }
+            const std::string& format = args[++i];
+            if (format != "json" && format != "human") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid format: " + format + ". Must be json|human");
+            }
+            // JSON is default, no need to store format preference for now
+        } else {
+            return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Unknown flag: " + arg);
+        }
+    }
+    
+    return CliResult::ok();
 }
 
 CliResult BatchIntrospectionCommand::parse_artifacts_args(const std::vector<std::string>& args, BatchInspectArtifactsRequest& request) {

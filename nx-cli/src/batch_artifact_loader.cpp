@@ -48,10 +48,10 @@ CliResult BatchArtifactLoader::load_policy_resolutions(const std::string& batch_
                                "Policy resolutions not found for batch ID: " + batch_id);
     }
     
-    // TODO: Implement actual artifact loading
-    policies.batch_id = batch_id;
-    
-    return CliResult::ok();
+    return CliResult::error(
+        CliErrorCode::NX_EXEC_FAILED,
+        "Policy resolution parsing not implemented"
+    );
 }
 
 CliResult BatchArtifactLoader::load_artifact_index(const std::string& batch_id, BatchArtifactIndex& index) {
@@ -126,8 +126,8 @@ std::string BatchArtifactLoader::get_execution_state_path(const std::string& bat
 }
 
 std::string BatchArtifactLoader::get_policy_resolution_path(const std::string& batch_id) {
-    // TODO: Use actual artifact storage conventions from existing phases
-    return "artifacts/policy_resolutions/" + batch_id + ".json";
+    // Use test fixtures for now, will be replaced with actual artifact storage
+    return "tests/fixtures/artifacts/policy_resolutions/" + batch_id + ".json";
 }
 
 std::string BatchArtifactLoader::get_artifact_index_path(const std::string& batch_id) {

@@ -1,0 +1,35 @@
+{
+  "batch_id": "test_batch_001",
+  "policy_resolutions": [
+    {
+      "job_id": "job_001",
+      "policy_type": "retry",
+      "policy_applied": "standard_retry_policy",
+      "resolved_decision": {
+        "max_attempts": 3,
+        "backoff_strategy": "exponential"
+      },
+      "resolution_timestamp": "2024-01-15T10:30:00Z"
+    },
+    {
+      "job_id": "job_001",
+      "policy_type": "failure",
+      "policy_applied": "fail_fast_policy",
+      "resolved_decision": {
+        "action": "terminate_batch",
+        "notify": true
+      },
+      "resolution_timestamp": "2024-01-15T10:30:01Z"
+    },
+    {
+      "job_id": "job_002",
+      "policy_type": "execution",
+      "policy_applied": "timeout_policy",
+      "resolved_decision": {
+        "timeout_seconds": 300,
+        "cleanup_on_timeout": true
+      },
+      "resolution_timestamp": "2024-01-15T10:30:02Z"
+    }
+  ]
+}
