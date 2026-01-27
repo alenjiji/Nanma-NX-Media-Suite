@@ -349,7 +349,8 @@ CliResult BatchIntrospectionCommand::handle_job(const std::vector<std::string>& 
     } else {
         // Remove trailing comma if no artifacts/timeline
         if (!request.flags.include_timeline) {
-            json.pop_back(); json.pop_back(); // Remove ",\n"
+            json.pop_back(); 
+            json.pop_back(); // Remove ",\n"
             json += "\n";
         }
     }
