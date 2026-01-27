@@ -1,6 +1,4 @@
 #include "batch_artifact_loader.h"
-#include <fstream>
-#include <algorithm>
 #include <filesystem>
 
 namespace nx::cli {
@@ -16,13 +14,10 @@ CliResult BatchArtifactLoader::load_batch_plan(const std::string& batch_id, Batc
                                "Batch plan not found for ID: " + batch_id);
     }
     
-    // TODO: Implement actual artifact loading from materialized files
-    // For now, return placeholder structure to establish interface
-    plan.batch_id = batch_id;
-    plan.plan_hash = "placeholder_hash";
-    plan.job_count = 0;
-    
-    return CliResult::ok();
+    return CliResult::error(
+        CliErrorCode::NX_EXEC_FAILED,
+        "Batch plan parsing not implemented"
+    );
 }
 
 CliResult BatchArtifactLoader::load_execution_state(const std::string& batch_id, BatchExecutionArtifact& execution) {
@@ -122,8 +117,8 @@ void BatchArtifactLoader::sort_artifacts_by_id(std::vector<ArtifactMetadata>& ar
 }
 
 std::string BatchArtifactLoader::get_batch_plan_path(const std::string& batch_id) {
-    // TODO: Use actual artifact storage conventions from existing phases
-    return "artifacts/batch_plans/" + batch_id + ".json";
+    // Use test fixtures for now, will be replaced with actual artifact storage
+    return "tests/fixtures/artifacts/batch_plans/" + batch_id + ".json";
 }
 
 std::string BatchArtifactLoader::get_execution_state_path(const std::string& batch_id) {

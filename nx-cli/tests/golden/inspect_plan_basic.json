@@ -1,0 +1,29 @@
+{
+  "batch_id": "test_batch_001",
+  "plan_hash": "sha256:abc123def456",
+  "job_count": 3,
+  "jobs": [
+    {
+      "job_id": "job_001",
+      "job_type": "convert",
+      "dependencies": [],
+      "execution_order": 1
+    },
+    {
+      "job_id": "job_002",
+      "job_type": "validate",
+      "dependencies": ["job_001"],
+      "execution_order": 2
+    },
+    {
+      "job_id": "job_003",
+      "job_type": "archive",
+      "dependencies": ["job_001", "job_002"],
+      "execution_order": 3
+    }
+  ],
+  "dag": {
+    "nodes": ["job_001", "job_002", "job_003"],
+    "edges": [["job_001", "job_002"], ["job_001", "job_003"], ["job_002", "job_003"]]
+  }
+}

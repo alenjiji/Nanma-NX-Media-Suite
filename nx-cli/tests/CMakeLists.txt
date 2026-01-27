@@ -24,6 +24,10 @@ target_link_libraries(test_batch_cli nx-cli-lib)
 add_executable(test_monitor_cli test_monitor_cli.cpp)
 target_link_libraries(test_monitor_cli nx-cli-lib)
 
+# Batch introspection golden test executable
+add_executable(test_batch_introspection_golden test_batch_introspection_golden.cpp)
+target_link_libraries(test_batch_introspection_golden nx-cli-lib)
+
 # Add test to CTest
 enable_testing()
 add_test(NAME cli_tests COMMAND test_cli)
@@ -32,3 +36,4 @@ add_test(NAME audio_cli_tests COMMAND test_audio_cli)
 add_test(NAME video_cli_tests COMMAND test_video_cli)
 add_test(NAME batch_cli_tests COMMAND test_batch_cli)
 add_test(NAME monitor_cli_tests COMMAND test_monitor_cli)
+add_test(NAME batch_introspection_golden_tests COMMAND test_batch_introspection_golden)

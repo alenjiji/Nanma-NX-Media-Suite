@@ -2,6 +2,7 @@
 #include "batch_artifact_loader.h"
 #include <iostream>
 #include <map>
+#include <algorithm>
 
 namespace nx::cli {
 
@@ -48,15 +49,166 @@ CliResult BatchIntrospectionCommand::execute(const std::vector<std::string>& arg
 }
 
 CliResult BatchIntrospectionCommand::handle_plan(const std::vector<std::string>& args) {
-    // TODO: Implement plan introspection
-    // For now, return skeleton response
-    output_json("{\"error\": \"Not implemented\", \"subcommand\": \"plan\"}");
+    BatchInspectPlanRequest request;
+    auto parse_result = parse_plan_args(args, request);
+    if (!parse_result.success) {
+        return parse_result;
+    }
+    
+    // Load batch plan artifact
+    BatchPlanArtifact plan;
+    auto load_result = BatchArtifactLoader::load_batch_plan(request.batch_id, plan);
+    if (!load_result.success) {
+        return load_result;
+    }
+    
+    // Generate JSON output according to contract schema
+    std::string json = "{\n";
+    json += "  \"batch_id\": \"" + escape_json_string(plan.batch_id) + "\",\n";
+    json += "  \"plan_hash\": \"" + escape_json_string(plan.plan_hash) + "\",\n";
+    json += "  \"job_count\": " + std::to_string(plan.job_count) + ",\n";
+    
+    // Jobs array (unless --dag-only)
+    if (!request.flags.dag_only) {
+        json += "  \"jobs\": [\n";
+        for (size_t i = 0; i < plan.job_ids.size(); ++i) {
+            const std::string& job_id = plan.job_ids[i];
+            json += "    {\n";
+            json += "      \"job_id\": \"" + escape_json_string(job_id) + "\",\n";
+            json += "      \"job_type\": \"" + escape_json_string(plan.job_types.at(job_id)) + "\",\n";
+            
+            // Dependencies array
+            json += "      \"dependencies\": [";
+            const auto& deps = plan.dependencies.at(job_id);
+            for (size_t j = 0; j < deps.size(); ++j) {
+                json += "\"" + escape_json_string(deps[j]) + "\"";
+                if (j < deps.size() - 1) json += ", ";
+            }
+            json += "],\n";
+            
+            json += "      \"execution_order\": " + std::to_string(plan.execution_order.at(job_id)) + "\n";
+            json += "    }";
+            if (i < plan.job_ids.size() - 1) json += ",";
+            json += "\n";
+        }
+        json += "  ]";
+        if (!request.flags.jobs_only) json += ",";
+        json += "\n";
+    }
+    
+    // DAG (unless --jobs-only)
+    if (!request.flags.jobs_only) {
+        json += "  \"dag\": {\n";
+        
+        // Nodes (sorted by job ID for determinism)
+        std::vector<std::string> sorted_nodes = plan.job_ids;
+        std::sort(sorted_nodes.begin(), sorted_nodes.end());
+        
+        json += "    \"nodes\": [";
+        for (size_t i = 0; i < sorted_nodes.size(); ++i) {
+            json += "\"" + escape_json_string(sorted_nodes[i]) + "\"";
+            if (i < sorted_nodes.size() - 1) json += ", ";
+        }
+        json += "],\n";
+        
+        // Edges (sorted lexicographically)
+        json += "    \"edges\": [";
+        std::vector<std::pair<std::string, std::string>> edges;
+        for (const auto& [job_id, deps] : plan.dependencies) {
+            for (const std::string& dep : deps) {
+                edges.emplace_back(dep, job_id);
+            }
+        }
+        std::sort(edges.begin(), edges.end());
+        
+        for (size_t i = 0; i < edges.size(); ++i) {
+            json += "[\"" + escape_json_string(edges[i].first) + "\", \"" + escape_json_string(edges[i].second) + "\"]";
+            if (i < edges.size() - 1) json += ", ";
+        }
+        json += "]\n";
+        
+        json += "  }\n";
+    }
+    
+    json += "}";
+    
+    output_json(json);
     return CliResult::ok();
 }
 
 CliResult BatchIntrospectionCommand::handle_jobs(const std::vector<std::string>& args) {
-    // TODO: Implement jobs introspection
-    output_json("{\"error\": \"Not implemented\", \"subcommand\": \"jobs\"}");
+    BatchInspectJobsRequest request;
+    auto parse_result = parse_jobs_args(args, request);
+    if (!parse_result.success) {
+        return parse_result;
+    }
+    
+    // Load batch plan artifact
+    BatchPlanArtifact plan;
+    auto load_result = BatchArtifactLoader::load_batch_plan(request.batch_id, plan);
+    if (!load_result.success) {
+        return load_result;
+    }
+    
+    // Prepare job list with metadata
+    std::vector<std::string> job_list = plan.job_ids;
+    
+    // Apply filtering if specified
+    if (!request.flags.filter_type.empty()) {
+        std::vector<std::string> filtered_jobs;
+        for (const std::string& job_id : job_list) {
+            if (plan.job_types.at(job_id) == request.flags.filter_type) {
+                filtered_jobs.push_back(job_id);
+            }
+        }
+        job_list = filtered_jobs;
+    }
+    
+    // Apply sorting
+    if (request.flags.sort == "id") {
+        std::sort(job_list.begin(), job_list.end());
+    } else if (request.flags.sort == "dependency") {
+        std::sort(job_list.begin(), job_list.end(), [&plan](const std::string& a, const std::string& b) {
+            size_t deps_a = plan.dependencies.at(a).size();
+            size_t deps_b = plan.dependencies.at(b).size();
+            if (deps_a != deps_b) return deps_a < deps_b;
+            return a < b; // Stable sort by ID
+        });
+    } else { // execution (default)
+        BatchArtifactLoader::sort_jobs_by_execution_order(job_list, plan.execution_order);
+    }
+    
+    // Generate JSON output according to contract schema
+    std::string json = "{\n";
+    json += "  \"batch_id\": \"" + escape_json_string(plan.batch_id) + "\",\n";
+    json += "  \"jobs\": [\n";
+    
+    for (size_t i = 0; i < job_list.size(); ++i) {
+        const std::string& job_id = job_list[i];
+        
+        // Calculate dependent count (jobs that depend on this job)
+        size_t dependent_count = 0;
+        for (const auto& [other_job, deps] : plan.dependencies) {
+            if (std::find(deps.begin(), deps.end(), job_id) != deps.end()) {
+                dependent_count++;
+            }
+        }
+        
+        json += "    {\n";
+        json += "      \"job_id\": \"" + escape_json_string(job_id) + "\",\n";
+        json += "      \"job_type\": \"" + escape_json_string(plan.job_types.at(job_id)) + "\",\n";
+        json += "      \"execution_order\": " + std::to_string(plan.execution_order.at(job_id)) + ",\n";
+        json += "      \"dependency_count\": " + std::to_string(plan.dependencies.at(job_id).size()) + ",\n";
+        json += "      \"dependent_count\": " + std::to_string(dependent_count) + "\n";
+        json += "    }";
+        if (i < job_list.size() - 1) json += ",";
+        json += "\n";
+    }
+    
+    json += "  ]\n";
+    json += "}";
+    
+    output_json(json);
     return CliResult::ok();
 }
 
@@ -91,13 +243,77 @@ CliResult BatchIntrospectionCommand::handle_artifact(const std::vector<std::stri
 }
 
 CliResult BatchIntrospectionCommand::parse_plan_args(const std::vector<std::string>& args, BatchInspectPlanRequest& request) {
-    // TODO: Implement argument parsing
-    return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Argument parsing not implemented");
+    if (args.empty()) {
+        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Missing required batch_id");
+    }
+    
+    request.batch_id = args[0];
+    
+    // Parse flags
+    for (size_t i = 1; i < args.size(); ++i) {
+        const std::string& arg = args[i];
+        
+        if (arg == "--jobs-only") {
+            request.flags.jobs_only = true;
+        } else if (arg == "--dag-only") {
+            request.flags.dag_only = true;
+        } else if (arg == "--format") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--format requires value");
+            }
+            const std::string& format = args[++i];
+            if (format != "json" && format != "human") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid format: " + format + ". Must be json|human");
+            }
+            // JSON is default, no need to store format preference for now
+        } else {
+            return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Unknown flag: " + arg);
+        }
+    }
+    
+    return CliResult::ok();
 }
 
 CliResult BatchIntrospectionCommand::parse_jobs_args(const std::vector<std::string>& args, BatchInspectJobsRequest& request) {
-    // TODO: Implement argument parsing
-    return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Argument parsing not implemented");
+    if (args.empty()) {
+        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Missing required batch_id");
+    }
+    
+    request.batch_id = args[0];
+    
+    // Parse flags
+    for (size_t i = 1; i < args.size(); ++i) {
+        const std::string& arg = args[i];
+        
+        if (arg == "--filter-type") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--filter-type requires value");
+            }
+            request.flags.filter_type = args[++i];
+        } else if (arg == "--sort") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--sort requires value");
+            }
+            const std::string& sort = args[++i];
+            if (sort != "execution" && sort != "dependency" && sort != "id") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid sort: " + sort + ". Must be execution|dependency|id");
+            }
+            request.flags.sort = sort;
+        } else if (arg == "--format") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--format requires value");
+            }
+            const std::string& format = args[++i];
+            if (format != "json" && format != "human") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid format: " + format + ". Must be json|human");
+            }
+            // JSON is default, no need to store format preference for now
+        } else {
+            return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Unknown flag: " + arg);
+        }
+    }
+    
+    return CliResult::ok();
 }
 
 CliResult BatchIntrospectionCommand::parse_status_args(const std::vector<std::string>& args, BatchInspectStatusRequest& request) {
