@@ -66,9 +66,18 @@ ExecutionGraph BatchEngineImpl::create_execution_graph(const BatchPlanSession& s
     std::vector<ExecutionNode> nodes;
     
     for (const auto& job : session.jobs()) {
+        // Create JobExecutionSpec from session job data
+        // For Phase 9, assume Convert component (will be enhanced in later phases)
+        JobExecutionSpec spec = JobExecutionSpec::create(
+            ComponentType::Convert,
+            job.command,
+            job.arguments
+        );
+        
         nodes.push_back(ExecutionNode{
-            .job_id = job.job_id,           // REFERENCED: Session job identity
-            .dependencies = job.dependencies // COPIED: Dependency structure from session
+            .job_id = job.job_id,           // EPHEMERAL: execution identity
+            .spec = std::move(spec),        // IMMUTABLE: intent identity
+            .dependencies = job.dependencies // COPIED: dependency structure from session
         });
     }
     
