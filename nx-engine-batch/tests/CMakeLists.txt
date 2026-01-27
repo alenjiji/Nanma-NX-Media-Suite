@@ -3,13 +3,14 @@ cmake_minimum_required(VERSION 3.20)
 # Test executables
 set(TEST_SOURCES
     test_batch_engine.cpp
-    test_batch_plan_session.cpp
+    test_session_architecture.cpp
     test_execution_interfaces.cpp
     test_execution_state.cpp
     test_deterministic_execution_engine.cpp
     test_execution_persistence.cpp
     test_retry_engine.cpp
     test_replay_driver.cpp
+    test_execution_result_envelope.cpp
 )
 
 # Create test executables
