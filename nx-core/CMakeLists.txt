@@ -16,7 +16,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # NX-Core library target
 set(NX_CORE_SOURCES
     src/nx_core.cpp
-    src/nx_identity.cpp
     src/identity.cpp
     src/logical_clock.cpp
     src/error_system.cpp
