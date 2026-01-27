@@ -19,6 +19,9 @@ add_library(nx-cli-lib
     src/batch_argument_parser.cpp
     src/batch_command.cpp
     src/argument_parser.cpp
+    src/metafix_argument_parser.cpp
+    src/monitor_argument_parser.cpp
+    src/monitor_command.cpp
 )
 
 target_include_directories(nx-cli-lib PUBLIC include)
