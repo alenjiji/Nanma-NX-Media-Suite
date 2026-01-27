@@ -69,7 +69,7 @@ CliResult MonitorCommand::execute(const std::vector<std::string>& args) {
     }
 }
 
-CliResult MonitorCommand::handle_status(const MonitorStatusRequest& request) {
+CliResult MonitorCommand::handle_status(const MonitorStatusRequest& /* request */) {
     std::cout << "nx monitor: request accepted\n";
     
     return CliResult::error(
@@ -78,7 +78,7 @@ CliResult MonitorCommand::handle_status(const MonitorStatusRequest& request) {
     );
 }
 
-CliResult MonitorCommand::handle_jobs(const MonitorJobsRequest& request) {
+CliResult MonitorCommand::handle_jobs(const MonitorJobsRequest& /* request */) {
     std::cout << "nx monitor: request accepted\n";
     
     return CliResult::error(
@@ -87,7 +87,7 @@ CliResult MonitorCommand::handle_jobs(const MonitorJobsRequest& request) {
     );
 }
 
-CliResult MonitorCommand::handle_job(const MonitorJobRequest& request) {
+CliResult MonitorCommand::handle_job(const MonitorJobRequest& /* request */) {
     std::cout << "nx monitor: request accepted\n";
     
     return CliResult::error(
@@ -96,7 +96,7 @@ CliResult MonitorCommand::handle_job(const MonitorJobRequest& request) {
     );
 }
 
-CliResult MonitorCommand::handle_engines(const MonitorEnginesRequest& request) {
+CliResult MonitorCommand::handle_engines(const MonitorEnginesRequest& /* request */) {
     std::cout << "nx monitor: request accepted\n";
     
     return CliResult::error(
@@ -105,7 +105,7 @@ CliResult MonitorCommand::handle_engines(const MonitorEnginesRequest& request) {
     );
 }
 
-CliResult MonitorCommand::handle_version(const MonitorVersionRequest& request) {
+CliResult MonitorCommand::handle_version(const MonitorVersionRequest& /* request */) {
     std::cout << "nx monitor: request accepted\n";
     
     return CliResult::error(
