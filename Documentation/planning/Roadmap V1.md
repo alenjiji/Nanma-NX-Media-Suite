@@ -1,118 +1,230 @@
-A
----
+# 📘 Nanma NX-MediaSuite — Final Roadmap (v1.0 FINAL)
 
-## **PROMPT 14A.1 — Define CLI Batch Introspection Contract**
-
-**Objective**
-Define the **read-only CLI contract** for Batch Introspection in Phase 14A.
-This contract specifies *what information may be exposed* via CLI, *how it is addressed*, and *what is explicitly forbidden*.
+**Status:** Authoritative
+**Purpose:** Complete, ship, and professionally close the project
+**Design Philosophy:** Explicit · Deterministic · Auditable · UI-last
 
 ---
 
-### **Authoritative Constraints**
+## 🧱 PHASE STATUS OVERVIEW
 
-* Phase 14A is **strictly read-only**
-* CLI is a **lossless projection** of existing Batch artifacts
-* No runtime hooks into schedulers, engines, or live state
-* No mutation, replay, retry, resume, or execution triggers
-* Must consume only:
+| Phase | Name                              | Status               |
+| ----: | --------------------------------- | -------------------- |
+|   1–6 | Core Engines & Foundations        | ✅ COMPLETE           |
+|     7 | Batch & Execution Architecture    | ✅ COMPLETE           |
+|  8–10 | Execution Models & Determinism    | ✅ COMPLETE           |
+|    11 | Policy Definitions (11.1–11.3)    | 🔒 FROZEN            |
+|    12 | Policy Interpretation Engine      | ✅ COMPLETE           |
+|    13 | CLI Adapters — **Monitor + Core** | 🔒 COMPLETE & TAGGED |
+|   14A | CLI Batch Introspection           | ⏳ NEXT               |
+|   14B | Python Bindings (CLI-mirrored)    | ⏳ UPCOMING           |
+|    15 | Qt UI                             | ⏳ FINAL              |
+|    16 | Documentation, Release & Closure  | ⏳ FINAL              |
 
-  * Batch plans
-  * Materialized DAGs
-  * Execution reports
-  * Telemetry / timelines
-  * Policy resolution artifacts
+> **Phase 14 is now explicitly split.**
+
+This is not scope creep — it's architectural correctness.
 
 ---
 
-### **Define the CLI Contract**
+## 🔒 PHASE 11 — POLICY (FROZEN)
 
-#### 1. Command Namespace
+### Phase 11.1 — Policy Data Model
 
-Define a dedicated namespace for batch introspection, for example:
+### Phase 11.2 — Policy Bindings
+
+### Phase 11.3 — Compatibility Rules
+
+**Status:** ✅ COMPLETE
+**Rules:**
+
+* Immutable
+* No extensions
+* No inference
+* No defaults outside explicit data
+
+> Phase 11 is the **law**. Everything after it is a consumer.
+
+---
+
+## 🧠 PHASE 12 — POLICY INTERPRETATION ENGINE (CURRENT)
+
+**Purpose:**
+A **read-only**, deterministic interpreter of Phase 11 policies.
+
+**Key Guarantees:**
+
+* No mutation
+* No defaults unless derivable
+* No inference
+* No scheduling
+* No retries
+* No execution
+* No side effects
+
+**Outputs:**
+
+* Interpreted policy state
+* Explicit, auditable decision artifacts
+* Engine-agnostic interpretation results
+
+**Hard Rule:**
+
+> Phase 12 explains *what the policy means*, not *what to do*.
+
+**Exit Criteria:**
+
+* Deterministic interpretation
+* Fully testable
+* Fully auditable
+* CLI-ready outputs
+
+---
+
+## 🖥️ PHASE 13 — CLI ADAPTERS
+
+**Purpose:**
+Expose Phase 12 **exactly as-is** to humans and automation.
+
+**Rules:**
+
+* No logic
+* No interpretation
+* No defaults
+* No convenience behavior
+* 1:1 mapping to Phase 12 outputs
+
+**Why CLI First:**
+
+* Forces completeness
+* Prevents UI-driven semantics
+* Becomes behavioral reference
+
+**Exit Criteria:**
+
+* CLI can express 100% of Phase 12
+* CLI output is machine-readable
+* CLI output is auditable
+* CLI becomes the canonical contract
+
+---
+
+## 🖥️ PHASE 14A — CLI BATCH INTROSPECTION
+
+**Purpose:**
+Expose **Batch state from Phase 12** via CLI, with the **same guarantees as Phase 13**.
+
+**Commands:**
 
 ```
-nx batch inspect ...
+nx batch status
+nx batch session <session_id>
+nx batch jobs <session_id>
 ```
 
-(no execution verbs allowed)
+**Rules:**
+
+* Read-only
+* No logic
+* No inference
+* Deterministic output
+* Same DTO / serializer / error model as Phase 13
+
+**Exit Criteria:**
+
+* CLI fully covers **batch introspection**
+* Golden tests lock output
+* CLI contract is complete for automation
+
+> **Phase 14A finishes the CLI surface.**
 
 ---
 
-#### 2. Required Introspection Surfaces
+## 🐍 PHASE 14B — PYTHON BINDINGS
 
-**A. Batch Plan / DAG**
+**Purpose:**
+Provide **Python access to the already-frozen CLI contract**.
 
-* List jobs
-* Show dependencies
-* Display execution order
-* Show job identity & type
-* Show resolved retry & failure policies (resolved view only)
+**Critical Rule (Now Explicit):**
 
-**B. Job-Level State (Materialized Only)**
+> **Python mirrors CLI semantics, not Phase 12 directly.**
 
-* Final state: success / failed / skipped
-* Retry count (from records)
-* Failure classification (if any)
+This guarantees:
 
-**C. Artifacts**
+* No Python-only behavior
+* No drift
+* No "helpful" abstractions
+* One canonical behavioral contract (CLI)
 
-* Reports
-* Validation summaries
-* Hashes
-* Timelines
-* Logs (read-only, structured)
+**Architectural Role:**
 
-**D. Policy Resolution Visibility**
+* Consumer of CLI contract
+* Automation layer
+* CI / scripting / notebooks
+* Zero Qt influence
 
-* Which policy applied
-* Final resolved decision
-* No policy re-evaluation
+**Exit Criteria:**
 
----
-
-#### 3. Addressing Model
-
-Specify how targets are addressed:
-
-* Batch ID
-* Job ID
-* Optional artifact selectors
-
-No implicit defaults, no live discovery.
+* Python == CLI == Phase 12
+* Round-trip equivalence
+* Deterministic outputs
 
 ---
 
-#### 4. Output Guarantees
+## 🖼️ PHASE 15 — QT UI (LAST, QUARANTINED)
 
-* Deterministic
-* Stable ordering
-* Machine-readable first (JSON), human-readable optional
-* No truncation without explicit flags
+**Purpose:**
+Visualization and orchestration only.
+
+**Rules (Non-Negotiable):**
+
+* No policy logic
+* No interpretation
+* No defaults
+* No hidden behavior
+* No state ownership of core logic
+
+**UI Is:**
+
+* A viewer
+* A dispatcher
+* A presenter
+
+**UI Is NOT:**
+
+* A decision-maker
+* A policy editor
+* A “smart assistant”
+
+**Hard Rule:**
+
+> The Qt UI must be **incapable** of doing anything the CLI cannot do.
+
+**Exit Criteria:**
+
+* Thin UI
+* Adapter-only
+* Replaceable without touching core
 
 ---
 
-#### 5. Explicitly Forbidden
+## 📚 PHASE 16 — PROFESSIONAL CLOSURE
 
-* Starting, stopping, retrying, or resuming batches
-* Live scheduler or worker inspection
-* Mutation of artifacts
-* Inference or recomputation
-* Any “smart” or adaptive behavior
+**Deliverables:**
 
----
+* Final architecture documentation
+* Phase freeze markers
+* Public API guarantees
+* Determinism guarantees
+* Audit guarantees
+* Maintenance notes
 
-### **Deliverable**
+**Project Closure Checklist:**
 
-Produce:
-
-* A **formal CLI contract**
-* Enumerated commands + flags
-* Input/output schema descriptions
-* Invariants & non-goals section
-
-No implementation.
-No code.
-No assumptions beyond existing phases.
+* ✅ No architectural debt
+* ✅ No implicit behavior
+* ✅ No UI leakage
+* ✅ Clear ownership boundaries
+* ✅ Long-term maintainability assured
 
 ---
