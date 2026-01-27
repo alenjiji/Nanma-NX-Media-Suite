@@ -6,6 +6,7 @@
 #include "serialize/MonitorStatusJsonSerializer.h"
 #include "serialize/MonitorStatusTextSerializer.h"
 #include "error/CliError.h"
+#include "nx/monitor/RealMonitorEngine.h"
 #include <iostream>
 
 namespace nx::cli {
@@ -37,7 +38,7 @@ int CliApp::run(const std::vector<std::string>& args) {
     
     switch (command) {
         case CommandId::MonitorStatus: {
-            nx::monitor::MonitorEngine engine;
+            nx::monitor::RealMonitorEngine engine;
             auto status = adapters::MonitorQueryAdapter::query_status(engine);
             dto::MonitorStatusDto dto(status);
             
