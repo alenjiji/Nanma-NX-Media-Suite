@@ -1,0 +1,30 @@
+{
+  "batch_id": "test_batch_001",
+  "execution_complete": true,
+  "job_states": [
+    {
+      "job_id": "job_001",
+      "job_type": "convert",
+      "final_state": "success",
+      "retry_count": 0,
+      "failure_classification": null,
+      "execution_duration_ms": 1500
+    },
+    {
+      "job_id": "job_002",
+      "job_type": "validate", 
+      "final_state": "success",
+      "retry_count": 1,
+      "failure_classification": null,
+      "execution_duration_ms": 800
+    },
+    {
+      "job_id": "job_003",
+      "job_type": "archive",
+      "final_state": "failed",
+      "retry_count": 2,
+      "failure_classification": "timeout",
+      "execution_duration_ms": null
+    }
+  ]
+}

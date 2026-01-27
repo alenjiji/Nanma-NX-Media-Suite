@@ -27,6 +27,7 @@ struct BatchPlanArtifact {
 // Execution State Data Structures
 struct JobExecutionState {
     std::string job_id;
+    std::string job_type;  // Job type for contract compliance
     std::string final_state;  // success|failed|skipped
     size_t retry_count;
     std::optional<std::string> failure_classification;

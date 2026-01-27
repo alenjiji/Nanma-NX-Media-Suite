@@ -31,11 +31,10 @@ CliResult BatchArtifactLoader::load_execution_state(const std::string& batch_id,
                                "Execution state not found for batch ID: " + batch_id);
     }
     
-    // TODO: Implement actual artifact loading
-    execution.batch_id = batch_id;
-    execution.execution_complete = false;
-    
-    return CliResult::ok();
+    return CliResult::error(
+        CliErrorCode::NX_EXEC_FAILED,
+        "Execution state parsing not implemented"
+    );
 }
 
 CliResult BatchArtifactLoader::load_policy_resolutions(const std::string& batch_id, BatchPolicyArtifact& policies) {
@@ -122,8 +121,8 @@ std::string BatchArtifactLoader::get_batch_plan_path(const std::string& batch_id
 }
 
 std::string BatchArtifactLoader::get_execution_state_path(const std::string& batch_id) {
-    // TODO: Use actual artifact storage conventions from existing phases
-    return "artifacts/execution_states/" + batch_id + ".json";
+    // Use test fixtures for now, will be replaced with actual artifact storage
+    return "tests/fixtures/artifacts/execution_states/" + batch_id + ".json";
 }
 
 std::string BatchArtifactLoader::get_policy_resolution_path(const std::string& batch_id) {

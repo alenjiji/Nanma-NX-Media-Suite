@@ -213,14 +213,150 @@ CliResult BatchIntrospectionCommand::handle_jobs(const std::vector<std::string>&
 }
 
 CliResult BatchIntrospectionCommand::handle_status(const std::vector<std::string>& args) {
-    // TODO: Implement status introspection
-    output_json("{\"error\": \"Not implemented\", \"subcommand\": \"status\"}");
+    BatchInspectStatusRequest request;
+    auto parse_result = parse_status_args(args, request);
+    if (!parse_result.success) {
+        return parse_result;
+    }
+    
+    // Load execution state artifact
+    BatchExecutionArtifact execution;
+    auto load_result = BatchArtifactLoader::load_execution_state(request.batch_id, execution);
+    if (!load_result.success) {
+        return load_result;
+    }
+    
+    // Check if execution is complete
+    if (!execution.execution_complete) {
+        return CliResult::error(CliErrorCode::ERROR_EXECUTION_INCOMPLETE, 
+                               "Batch execution not complete for ID: " + request.batch_id);
+    }
+    
+    // Apply state filtering if specified
+    std::vector<JobExecutionState> filtered_states = execution.job_states;
+    if (!request.flags.filter_state.empty()) {
+        std::vector<JobExecutionState> temp_states;
+        for (const auto& state : filtered_states) {
+            if (state.final_state == request.flags.filter_state) {
+                temp_states.push_back(state);
+            }
+        }
+        filtered_states = temp_states;
+    }
+    
+    // Sort by execution order (assuming job_id contains order info), then by job_id
+    std::sort(filtered_states.begin(), filtered_states.end(), [](const JobExecutionState& a, const JobExecutionState& b) {
+        return a.job_id < b.job_id; // Deterministic sort by job_id
+    });
+    
+    // Generate JSON output according to contract schema
+    std::string json = "{\n";
+    json += "  \"batch_id\": \"" + escape_json_string(execution.batch_id) + "\",\n";
+    json += "  \"execution_complete\": " + (execution.execution_complete ? "true" : "false") + ",\n";
+    json += "  \"job_states\": [\n";
+    
+    for (size_t i = 0; i < filtered_states.size(); ++i) {
+        const auto& state = filtered_states[i];
+        
+        json += "    {\n";
+        json += "      \"job_id\": \"" + escape_json_string(state.job_id) + "\",\n";
+        json += "      \"final_state\": \"" + escape_json_string(state.final_state) + "\",\n";
+        
+        if (request.flags.include_retries) {
+            json += "      \"retry_count\": " + std::to_string(state.retry_count) + ",\n";
+        }
+        
+        if (state.failure_classification.has_value()) {
+            json += "      \"failure_classification\": \"" + escape_json_string(state.failure_classification.value()) + "\",\n";
+        } else {
+            json += "      \"failure_classification\": null,\n";
+        }
+        
+        if (state.execution_duration_ms.has_value()) {
+            json += "      \"execution_duration_ms\": " + std::to_string(state.execution_duration_ms.value()) + "\n";
+        } else {
+            json += "      \"execution_duration_ms\": null\n";
+        }
+        
+        json += "    }";
+        if (i < filtered_states.size() - 1) json += ",";
+        json += "\n";
+    }
+    
+    json += "  ]\n";
+    json += "}";
+    
+    output_json(json);
     return CliResult::ok();
 }
 
 CliResult BatchIntrospectionCommand::handle_job(const std::vector<std::string>& args) {
-    // TODO: Implement job introspection
-    output_json("{\"error\": \"Not implemented\", \"subcommand\": \"job\"}");
+    BatchInspectJobRequest request;
+    auto parse_result = parse_job_args(args, request);
+    if (!parse_result.success) {
+        return parse_result;
+    }
+    
+    // Load execution state artifact
+    BatchExecutionArtifact execution;
+    auto load_result = BatchArtifactLoader::load_execution_state(request.batch_id, execution);
+    if (!load_result.success) {
+        return load_result;
+    }
+    
+    // Check if execution is complete
+    if (!execution.execution_complete) {
+        return CliResult::error(CliErrorCode::ERROR_EXECUTION_INCOMPLETE, 
+                               "Batch execution not complete for ID: " + request.batch_id);
+    }
+    
+    // Find the specific job
+    JobExecutionState* job_state = nullptr;
+    for (auto& state : execution.job_states) {
+        if (state.job_id == request.job_id) {
+            job_state = &state;
+            break;
+        }
+    }
+    
+    if (!job_state) {
+        return CliResult::error(CliErrorCode::ERROR_JOB_NOT_FOUND, 
+                               "Job not found: " + request.job_id + " in batch: " + request.batch_id);
+    }
+    
+    // Generate JSON output according to contract schema
+    std::string json = "{\n";
+    json += "  \"batch_id\": \"" + escape_json_string(execution.batch_id) + "\",\n";
+    json += "  \"job_id\": \"" + escape_json_string(job_state->job_id) + "\",\n";
+    json += "  \"job_type\": \"" + escape_json_string(job_state->job_type) + "\",\n";
+    json += "  \"final_state\": \"" + escape_json_string(job_state->final_state) + "\",\n";
+    json += "  \"retry_count\": " + std::to_string(job_state->retry_count) + ",\n";
+    
+    if (job_state->failure_classification.has_value()) {
+        json += "  \"failure_classification\": \"" + escape_json_string(job_state->failure_classification.value()) + "\",\n";
+    } else {
+        json += "  \"failure_classification\": null,\n";
+    }
+    
+    // Timeline (only if requested)
+    if (request.flags.include_timeline) {
+        json += "  \"execution_timeline\": [],\n"; // Empty for now - no timeline data available
+    }
+    
+    // Artifacts (only if requested)
+    if (request.flags.include_artifacts) {
+        json += "  \"artifacts\": []\n"; // Empty for now - no artifact data available
+    } else {
+        // Remove trailing comma if no artifacts/timeline
+        if (!request.flags.include_timeline) {
+            json.pop_back(); json.pop_back(); // Remove ",\n"
+            json += "\n";
+        }
+    }
+    
+    json += "}";
+    
+    output_json(json);
     return CliResult::ok();
 }
 
@@ -317,13 +453,75 @@ CliResult BatchIntrospectionCommand::parse_jobs_args(const std::vector<std::stri
 }
 
 CliResult BatchIntrospectionCommand::parse_status_args(const std::vector<std::string>& args, BatchInspectStatusRequest& request) {
-    // TODO: Implement argument parsing
-    return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Argument parsing not implemented");
+    if (args.empty()) {
+        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Missing required batch_id");
+    }
+    
+    request.batch_id = args[0];
+    
+    // Parse flags
+    for (size_t i = 1; i < args.size(); ++i) {
+        const std::string& arg = args[i];
+        
+        if (arg == "--filter-state") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--filter-state requires value");
+            }
+            const std::string& state = args[++i];
+            if (state != "success" && state != "failed" && state != "skipped") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid state: " + state + ". Must be success|failed|skipped");
+            }
+            request.flags.filter_state = state;
+        } else if (arg == "--include-retries") {
+            request.flags.include_retries = true;
+        } else if (arg == "--format") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--format requires value");
+            }
+            const std::string& format = args[++i];
+            if (format != "json" && format != "human") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid format: " + format + ". Must be json|human");
+            }
+            // JSON is default, no need to store format preference for now
+        } else {
+            return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Unknown flag: " + arg);
+        }
+    }
+    
+    return CliResult::ok();
 }
 
 CliResult BatchIntrospectionCommand::parse_job_args(const std::vector<std::string>& args, BatchInspectJobRequest& request) {
-    // TODO: Implement argument parsing
-    return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Argument parsing not implemented");
+    if (args.size() < 2) {
+        return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Missing required batch_id and job_id");
+    }
+    
+    request.batch_id = args[0];
+    request.job_id = args[1];
+    
+    // Parse flags
+    for (size_t i = 2; i < args.size(); ++i) {
+        const std::string& arg = args[i];
+        
+        if (arg == "--include-artifacts") {
+            request.flags.include_artifacts = true;
+        } else if (arg == "--include-timeline") {
+            request.flags.include_timeline = true;
+        } else if (arg == "--format") {
+            if (i + 1 >= args.size()) {
+                return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "--format requires value");
+            }
+            const std::string& format = args[++i];
+            if (format != "json" && format != "human") {
+                return CliResult::error(CliErrorCode::NX_CLI_ENUM_ERROR, "Invalid format: " + format + ". Must be json|human");
+            }
+            // JSON is default, no need to store format preference for now
+        } else {
+            return CliResult::error(CliErrorCode::NX_CLI_USAGE_ERROR, "Unknown flag: " + arg);
+        }
+    }
+    
+    return CliResult::ok();
 }
 
 CliResult BatchIntrospectionCommand::parse_policies_args(const std::vector<std::string>& args, BatchInspectPoliciesRequest& request) {
