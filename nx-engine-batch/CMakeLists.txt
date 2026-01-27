@@ -10,7 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Include directories
 include_directories(include)
 
-# Source files
+# Add new source files for Phase 10.1, 10.2, and 10.3
 set(BATCH_ENGINE_SOURCES
     src/BatchEngineImpl.cpp
     src/BatchPlanSession.cpp
@@ -21,6 +21,9 @@ set(BATCH_ENGINE_SOURCES
     src/ExecutionCoordinator.cpp
     src/ExecutionState.cpp
     src/DeterministicExecutionEngine.cpp
+    src/ExecutionPersistence.cpp
+    src/RetryEngine.cpp
+    src/ReplayDriver.cpp
 )
 
 # Batch Engine Library

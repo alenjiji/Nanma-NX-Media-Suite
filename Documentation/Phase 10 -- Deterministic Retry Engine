@@ -1,0 +1,86 @@
+# 🔒 Nanma NX-MediaSuite — **Phase 10 Official Freeze**
+
+## Deterministic Retry Engine
+
+**Phase 10 — Deterministic Retries, Replay Persistence & Verification**
+
+---
+
+## Scope (Final & Locked)
+
+Phase 10 introduces **deterministic execution replayability** without adding recovery, scheduling, or autonomy.
+
+### Included Sub-Phases
+
+| Sub-Phase | Name                                               | Status     |
+| --------- | -------------------------------------------------- | ---------- |
+| 10.1      | Deterministic Retry Engine                         | ✅ Complete |
+| 10.2      | Execution Persistence for Replay                   | ✅ Complete |
+| 10.3      | Deterministic Replay Driver & Verification Harness | ✅ Complete |
+
+---
+
+## Guarantees (Now Immutable)
+
+Phase 10 guarantees:
+
+* Explicit, deterministic retry execution
+* Immutable execution intent (`JobExecutionSpec`)
+* Unique `SessionJobId` per attempt
+* Append-only, replay-only execution persistence
+* Offline deterministic replay
+* Explicit divergence detection
+* Zero time, zero randomness, zero autonomy
+
+---
+
+## Explicit Non-Guarantees (Sealed)
+
+Phase 10 **does not** provide:
+
+* Resume or recovery
+* Scheduling or retry policies
+* Checkpointing
+* Progress tracking
+* Runtime intelligence
+* Environment or machine state persistence
+* Execution optimization
+
+Any such behavior belongs to **Phase 11+** only.
+
+---
+
+## Architectural Invariants (Frozen)
+
+These invariants are now **non-negotiable**:
+
+* Persistence explains the past; never controls the future
+* Replay is forensic, not operational
+* Retry is explicit, never autonomous
+* Determinism is structural, not temporal
+* Execution state is never resumed
+
+---
+
+## Validation Status
+
+Phase 10 has been:
+
+* Implemented
+* Unit-tested
+* Negative-capability tested
+* Replay-verified
+* Re-validated after corrections
+* Audited for roadmap compliance
+
+No open TODOs remain.
+
+---
+
+## Roadmap Update Statement
+
+> **Phase 10 is complete and frozen.**
+> All future work must treat Phase 10 behavior as immutable.
+> Any recovery, scheduling, or policy logic must begin in Phase 11.
+
+---

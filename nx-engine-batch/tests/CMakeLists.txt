@@ -1,29 +1,34 @@
 cmake_minimum_required(VERSION 3.20)
 
 # Test executables
-add_executable(test_batch_engine test_batch_engine.cpp)
-target_link_libraries(test_batch_engine nx-engine-batch)
+set(TEST_SOURCES
+    test_batch_engine.cpp
+    test_batch_plan_session.cpp
+    test_execution_interfaces.cpp
+    test_execution_state.cpp
+    test_deterministic_execution_engine.cpp
+    test_execution_persistence.cpp
+    test_retry_engine.cpp
+    test_replay_driver.cpp
+)
 
-add_executable(test_session_architecture test_session_architecture.cpp)
-target_link_libraries(test_session_architecture nx-engine-batch)
+# Create test executables
+foreach(TEST_SOURCE ${TEST_SOURCES})
+    get_filename_component(TEST_NAME ${TEST_SOURCE} NAME_WE)
+    add_executable(${TEST_NAME} ${TEST_SOURCE})
+    
+    target_link_libraries(${TEST_NAME} PRIVATE nx-engine-batch nx-core)
+    
+    # Compiler warnings
+    if(MSVC)
+        target_compile_options(${TEST_NAME} PRIVATE /W4)
+    else()
+        target_compile_options(${TEST_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+    
+    # Add to test suite
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+endforeach()
 
-add_executable(test_execution_interfaces test_execution_interfaces.cpp)
-target_link_libraries(test_execution_interfaces nx-engine-batch)
-
-add_executable(test_execution_result_envelope test_execution_result_envelope.cpp)
-target_link_libraries(test_execution_result_envelope nx-engine-batch)
-
-add_executable(test_execution_state test_execution_state.cpp)
-target_link_libraries(test_execution_state nx-engine-batch)
-
-add_executable(test_deterministic_execution_engine test_deterministic_execution_engine.cpp)
-target_link_libraries(test_deterministic_execution_engine nx-engine-batch)
-
-# Add tests to CTest
+# Enable testing
 enable_testing()
-add_test(NAME batch_engine_tests COMMAND test_batch_engine)
-add_test(NAME session_architecture_tests COMMAND test_session_architecture)
-add_test(NAME execution_interfaces_tests COMMAND test_execution_interfaces)
-add_test(NAME execution_result_envelope_tests COMMAND test_execution_result_envelope)
-add_test(NAME execution_state_tests COMMAND test_execution_state)
-add_test(NAME deterministic_execution_engine_tests COMMAND test_deterministic_execution_engine)
