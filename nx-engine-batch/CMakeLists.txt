@@ -31,6 +31,7 @@ target_include_directories(nx-engine-batch PUBLIC include)
 target_include_directories(nx-engine-batch PRIVATE 
     ${CMAKE_SOURCE_DIR}/nx-core/include
 )
+target_link_libraries(nx-engine-batch PRIVATE nx-core)
 
 # Compiler warnings
 if(MSVC)
