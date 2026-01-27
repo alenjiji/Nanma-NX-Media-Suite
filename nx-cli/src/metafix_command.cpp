@@ -5,7 +5,7 @@
 
 namespace nx::cli {
 
-static nx::meta::MetaRepairRequest translate_to_meta_engine_request(const RepairRequest& cli_request) {
+static nx::meta::MetaRepairRequest translate_to_meta_engine_request(const RepairRequest& /* cli_request */) {
     return nx::meta::MetaRepairRequest{};
 }
 
