@@ -1,0 +1,16 @@
+#pragma once
+
+#include <string>
+
+namespace nx::cli::dto {
+    struct MonitorStatusDto;
+}
+
+namespace nx::cli::serialize {
+
+class MonitorStatusTextSerializer {
+public:
+    static std::string serialize(const dto::MonitorStatusDto& dto);
+};
+
+} // namespace nx::cli::serialize
