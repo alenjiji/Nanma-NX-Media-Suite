@@ -4,6 +4,7 @@
 #include "RetryEngine.h"
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 namespace nx::batch {
 
