@@ -33,7 +33,7 @@ BatchPlanSession BatchEngineImpl::create_session(const std::vector<ParsedBatchCo
     
     for (size_t i = 0; i < commands.size(); ++i) {
         if (commands[i].valid) {
-            SessionJobId job_id{session_id, generate_job_id(i + 1)};
+            SessionJobId job_id = SessionJobId::create_initial(session_id, generate_job_id(i + 1));
             
             jobs.push_back(SessionJobDescriptor{
                 .job_id = job_id,
