@@ -8,6 +8,7 @@ add_executable(nx-cli
     src/main.cpp
     src/CliApp.cpp
     src/CommandRegistry.cpp
+    src/adapters/MonitorQueryAdapter.cpp
 )
 
 target_include_directories(nx-cli PRIVATE src)
