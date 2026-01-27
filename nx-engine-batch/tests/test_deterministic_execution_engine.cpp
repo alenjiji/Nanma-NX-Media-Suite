@@ -31,23 +31,29 @@ public:
 };
 
 // Controllable job executor for testing failure scenarios
-class TestJobExecutor : public JobExecutor {
+class TestJobExecutor : public nx::batch::JobExecutor {
 public:
-    std::vector<SessionJobId> fail_jobs;  // Jobs that should fail
-    std::vector<SessionJobId> executed_jobs;  // Track execution order
-    
-    JobExecutionResult execute_job(const SessionJobId& job_id) override {
-        executed_jobs.push_back(job_id);
-        
-        bool should_fail = std::find(fail_jobs.begin(), fail_jobs.end(), job_id) != fail_jobs.end();
-        
+    // Specs that should fail (configured before execution)
+    std::vector<JobSpecHash> fail_specs;
+
+    // Observational state (allowed to change in const method)
+    mutable std::vector<JobSpecHash> executed_specs;
+
+    JobExecutionResult
+    execute_job(const JobExecutionSpec& spec) const override {
+        executed_specs.push_back(spec.hash);
+
+        bool should_fail =
+            std::find(fail_specs.begin(), fail_specs.end(), spec.hash) != fail_specs.end();
+
         return JobExecutionResult{
-            .job_id = job_id,
             .success = !should_fail,
-            .message = should_fail ? "Test failure" : "Test success"
+            .message = should_fail ? "Test failure" : "Test success",
+            .result_token = "test_result_" + spec.hash.value
         };
     }
 };
+
 
 void test_deterministic_execution_order() {
     // Create execution graph with multiple jobs
@@ -148,7 +154,8 @@ void test_deterministic_failure_halt() {
     // Configure second job to fail
     auto job_executor = std::make_shared<TestJobExecutor>();
     auto all_states = ExecutionStateStore(execution_graph).get_all_states();
-    job_executor->fail_jobs.push_back(all_states[1].job_id);  // Fail second job
+    auto spec = execution_graph.get_spec(all_states[1].job_id);
+    job_executor->fail_specs.push_back(spec->hash);  // Fail second job
     
     TestExecutionObserver observer;
     DeterministicExecutionEngine engine(execution_graph, job_executor, &observer);
