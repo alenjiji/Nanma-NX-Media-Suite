@@ -1,189 +1,118 @@
-# 📘 Nanma NX-MediaSuite — Final Roadmap (v1.0 FINAL)
+A
+---
 
-**Status:** Authoritative
-**Purpose:** Complete, ship, and professionally close the project
-**Design Philosophy:** Explicit · Deterministic · Auditable · UI-last
+## **PROMPT 14A.1 — Define CLI Batch Introspection Contract**
+
+**Objective**
+Define the **read-only CLI contract** for Batch Introspection in Phase 14A.
+This contract specifies *what information may be exposed* via CLI, *how it is addressed*, and *what is explicitly forbidden*.
 
 ---
 
-## 🧱 PHASE STATUS OVERVIEW
+### **Authoritative Constraints**
 
-| Phase     | Name                               | Status                 |
-| --------- | ---------------------------------- | ---------------------- |
-| 1–6       | Core Engines & Foundations         | ✅ COMPLETE             |
-| 7         | Batch & Execution Architecture     | ✅ COMPLETE             |
-| 8–10      | Execution Models & Determinism     | ✅ COMPLETE             |
-| 11.1–11.3 | Policy Definitions & Compatibility | ✅ COMPLETE & 🔒 FROZEN |
-| 12        | Policy Interpretation Engine       | ⏳ CURRENT              |
-| 13        | CLI Adapters                       | ⏳ UPCOMING             |
-| 14        | Python Bindings                    | ⏳ UPCOMING             |
-| 15        | Qt UI                              | ⏳ FINAL                |
-| 16        | Documentation, Release & Closure   | ⏳ FINAL                |
+* Phase 14A is **strictly read-only**
+* CLI is a **lossless projection** of existing Batch artifacts
+* No runtime hooks into schedulers, engines, or live state
+* No mutation, replay, retry, resume, or execution triggers
+* Must consume only:
 
----
-
-## 🔒 PHASE 11 — POLICY (FROZEN)
-
-### Phase 11.1 — Policy Data Model
-
-### Phase 11.2 — Policy Bindings
-
-### Phase 11.3 — Compatibility Rules
-
-**Status:** ✅ COMPLETE
-**Rules:**
-
-* Immutable
-* No extensions
-* No inference
-* No defaults outside explicit data
-
-> Phase 11 is the **law**. Everything after it is a consumer.
+  * Batch plans
+  * Materialized DAGs
+  * Execution reports
+  * Telemetry / timelines
+  * Policy resolution artifacts
 
 ---
 
-## 🧠 PHASE 12 — POLICY INTERPRETATION ENGINE (CURRENT)
+### **Define the CLI Contract**
 
-**Purpose:**
-A **read-only**, deterministic interpreter of Phase 11 policies.
+#### 1. Command Namespace
 
-**Key Guarantees:**
+Define a dedicated namespace for batch introspection, for example:
 
-* No mutation
-* No defaults unless derivable
-* No inference
-* No scheduling
-* No retries
-* No execution
-* No side effects
+```
+nx batch inspect ...
+```
 
-**Outputs:**
-
-* Interpreted policy state
-* Explicit, auditable decision artifacts
-* Engine-agnostic interpretation results
-
-**Hard Rule:**
-
-> Phase 12 explains *what the policy means*, not *what to do*.
-
-**Exit Criteria:**
-
-* Deterministic interpretation
-* Fully testable
-* Fully auditable
-* CLI-ready outputs
+(no execution verbs allowed)
 
 ---
 
-## 🖥️ PHASE 13 — CLI ADAPTERS
+#### 2. Required Introspection Surfaces
 
-**Purpose:**
-Expose Phase 12 **exactly as-is** to humans and automation.
+**A. Batch Plan / DAG**
 
-**Rules:**
+* List jobs
+* Show dependencies
+* Display execution order
+* Show job identity & type
+* Show resolved retry & failure policies (resolved view only)
 
-* No logic
-* No interpretation
-* No defaults
-* No convenience behavior
-* 1:1 mapping to Phase 12 outputs
+**B. Job-Level State (Materialized Only)**
 
-**Why CLI First:**
+* Final state: success / failed / skipped
+* Retry count (from records)
+* Failure classification (if any)
 
-* Forces completeness
-* Prevents UI-driven semantics
-* Becomes behavioral reference
+**C. Artifacts**
 
-**Exit Criteria:**
+* Reports
+* Validation summaries
+* Hashes
+* Timelines
+* Logs (read-only, structured)
 
-* CLI can express 100% of Phase 12
-* CLI output is machine-readable
-* CLI output is auditable
-* CLI becomes the canonical contract
+**D. Policy Resolution Visibility**
 
----
-
-## 🐍 PHASE 14 — PYTHON BINDINGS
-
-**Purpose:**
-Enable automation, CI, scripting, notebooks.
-
-**Rules:**
-
-* Strict mirror of CLI semantics
-* No Python-only behavior
-* No sugar
-* No implicit conversions
-
-**Architectural Role:**
-
-* API consumer
-* Not a design driver
-* Proves UI-agnosticism
-
-**Exit Criteria:**
-
-* Python == CLI == Phase 12
-* Used in batch, CI, tests
-* Zero Qt leakage
+* Which policy applied
+* Final resolved decision
+* No policy re-evaluation
 
 ---
 
-## 🖼️ PHASE 15 — QT UI (LAST, QUARANTINED)
+#### 3. Addressing Model
 
-**Purpose:**
-Visualization and orchestration only.
+Specify how targets are addressed:
 
-**Rules (Non-Negotiable):**
+* Batch ID
+* Job ID
+* Optional artifact selectors
 
-* No policy logic
-* No interpretation
-* No defaults
-* No hidden behavior
-* No state ownership of core logic
-
-**UI Is:**
-
-* A viewer
-* A dispatcher
-* A presenter
-
-**UI Is NOT:**
-
-* A decision-maker
-* A policy editor
-* A “smart assistant”
-
-**Hard Rule:**
-
-> The Qt UI must be **incapable** of doing anything the CLI cannot do.
-
-**Exit Criteria:**
-
-* Thin UI
-* Adapter-only
-* Replaceable without touching core
+No implicit defaults, no live discovery.
 
 ---
 
-## 📚 PHASE 16 — PROFESSIONAL CLOSURE
+#### 4. Output Guarantees
 
-**Deliverables:**
+* Deterministic
+* Stable ordering
+* Machine-readable first (JSON), human-readable optional
+* No truncation without explicit flags
 
-* Final architecture documentation
-* Phase freeze markers
-* Public API guarantees
-* Determinism guarantees
-* Audit guarantees
-* Maintenance notes
+---
 
-**Project Closure Checklist:**
+#### 5. Explicitly Forbidden
 
-* ✅ No architectural debt
-* ✅ No implicit behavior
-* ✅ No UI leakage
-* ✅ Clear ownership boundaries
-* ✅ Long-term maintainability assured
+* Starting, stopping, retrying, or resuming batches
+* Live scheduler or worker inspection
+* Mutation of artifacts
+* Inference or recomputation
+* Any “smart” or adaptive behavior
+
+---
+
+### **Deliverable**
+
+Produce:
+
+* A **formal CLI contract**
+* Enumerated commands + flags
+* Input/output schema descriptions
+* Invariants & non-goals section
+
+No implementation.
+No code.
+No assumptions beyond existing phases.
 
 ---
