@@ -53,10 +53,10 @@ ReplayReport ReplayDriver::replay_and_verify(const ExecutionReplaySource& source
 
 std::vector<RetryChain> ReplayDriver::reconstruct_retry_chains(const std::vector<ExecutionRecord>& records) {
     // Group records by intent hash to reconstruct retry chains
-    std::unordered_map<std::string, std::vector<ExecutionRecord>> chains_by_intent;
+    std::unordered_map<std::string, std::vector<const ExecutionRecord*>> chains_by_intent;
     
     for (const auto& record : records) {
-        chains_by_intent[record.intent.hash.value].push_back(record);
+        chains_by_intent[record.intent.hash.value].push_back(&record);
     }
     
     // Reconstruct retry chains
@@ -65,13 +65,13 @@ std::vector<RetryChain> ReplayDriver::reconstruct_retry_chains(const std::vector
     for (auto& [intent_hash, chain_records] : chains_by_intent) {
         // Sort by retry index to maintain deterministic order
         std::sort(chain_records.begin(), chain_records.end(),
-                  [](const ExecutionRecord& a, const ExecutionRecord& b) {
-                      return a.retry_index < b.retry_index;
+                  [](const ExecutionRecord* a, const ExecutionRecord* b) {
+                      return a->retry_index < b->retry_index;
                   });
         
         if (!chain_records.empty()) {
             // Create retry chain from first record
-            auto& first_record = chain_records[0];
+            const auto& first_record = *chain_records[0];
             auto initial_attempt = RetryAttempt{
                 .attempt_id = first_record.attempt_id,
                 .parent_attempt_id = first_record.parent_attempt_id,
@@ -82,7 +82,7 @@ std::vector<RetryChain> ReplayDriver::reconstruct_retry_chains(const std::vector
             
             // Add remaining attempts to chain
             for (size_t i = 1; i < chain_records.size(); ++i) {
-                auto& record = chain_records[i];
+                const auto& record = *chain_records[i];
                 auto retry_attempt = RetryAttempt{
                     .attempt_id = record.attempt_id,
                     .parent_attempt_id = record.parent_attempt_id,
