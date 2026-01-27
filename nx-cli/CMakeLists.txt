@@ -12,6 +12,7 @@ add_executable(nx-cli
     src/dto/MonitorStatusDto.cpp
     src/serialize/MonitorStatusJsonSerializer.cpp
     src/serialize/MonitorStatusTextSerializer.cpp
+    src/error/CliError.cpp
 )
 
 target_include_directories(nx-cli PRIVATE src)
