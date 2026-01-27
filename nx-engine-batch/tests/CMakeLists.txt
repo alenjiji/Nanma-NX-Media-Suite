@@ -13,9 +13,17 @@ target_link_libraries(test_execution_interfaces nx-engine-batch)
 add_executable(test_execution_result_envelope test_execution_result_envelope.cpp)
 target_link_libraries(test_execution_result_envelope nx-engine-batch)
 
+add_executable(test_execution_state test_execution_state.cpp)
+target_link_libraries(test_execution_state nx-engine-batch)
+
+add_executable(test_deterministic_execution_engine test_deterministic_execution_engine.cpp)
+target_link_libraries(test_deterministic_execution_engine nx-engine-batch)
+
 # Add tests to CTest
 enable_testing()
 add_test(NAME batch_engine_tests COMMAND test_batch_engine)
 add_test(NAME session_architecture_tests COMMAND test_session_architecture)
 add_test(NAME execution_interfaces_tests COMMAND test_execution_interfaces)
 add_test(NAME execution_result_envelope_tests COMMAND test_execution_result_envelope)
+add_test(NAME execution_state_tests COMMAND test_execution_state)
+add_test(NAME deterministic_execution_engine_tests COMMAND test_deterministic_execution_engine)

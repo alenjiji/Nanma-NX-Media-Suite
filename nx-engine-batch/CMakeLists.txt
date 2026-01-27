@@ -17,6 +17,8 @@ set(BATCH_ENGINE_SOURCES
     src/ExecutionInput.cpp
     src/ExecutionGraph.cpp
     src/ExecutionCoordinator.cpp
+    src/ExecutionState.cpp
+    src/DeterministicExecutionEngine.cpp
 )
 
 # Batch Engine Library

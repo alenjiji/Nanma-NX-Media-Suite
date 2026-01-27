@@ -46,6 +46,10 @@ target_link_libraries(test_law_violations nx-core)
 add_executable(test_replay_proof test_replay_proof.cpp)
 target_link_libraries(test_replay_proof nx-core)
 
+# Deterministic numeric policy tests
+add_executable(test_deterministic_numeric_policy test_deterministic_numeric_policy.cpp)
+target_link_libraries(test_deterministic_numeric_policy nx-core)
+
 # Register tests with CTest
 add_test(NAME identity_tests COMMAND test_nx_identity)
 add_test(NAME logical_clock_tests COMMAND test_logical_clock)
@@ -56,3 +60,4 @@ add_test(NAME batchflow_workflow_tests COMMAND test_batchflow_workflow)
 add_test(NAME determinism_critical_tests COMMAND test_determinism_critical)
 add_test(NAME law_violation_tests COMMAND test_law_violations)
 add_test(NAME replay_proof_tests COMMAND test_replay_proof)
+add_test(NAME deterministic_numeric_policy_tests COMMAND test_deterministic_numeric_policy)
