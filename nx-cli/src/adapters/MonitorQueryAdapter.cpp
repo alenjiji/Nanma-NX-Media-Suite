@@ -1,4 +1,5 @@
 #include "MonitorQueryAdapter.h"
+#include "nx/monitor/MonitorEngine.h"
 
 namespace nx::cli::adapters {
 
