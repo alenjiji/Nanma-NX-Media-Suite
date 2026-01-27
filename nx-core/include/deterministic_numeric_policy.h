@@ -3,6 +3,7 @@
 #include <cfenv>
 #include <cmath>
 #include <cstdint>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <memory>
