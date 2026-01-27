@@ -5,7 +5,7 @@
 
 namespace nx::cli {
 
-static nx::convert::TranscodeRequest translate_to_engine_request(const TranscodeRequest& cli_request) {
+static nx::convert::TranscodeRequest translate_to_engine_request(const TranscodeRequest& /* cli_request */) {
     return nx::convert::TranscodeRequest{};
 }
 
