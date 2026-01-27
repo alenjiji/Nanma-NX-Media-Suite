@@ -17,8 +17,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(NX_CORE_SOURCES
     src/nx_core.cpp
     src/identity.cpp
-    src/logical_clock.cpp
-    src/error_system.cpp
     src/result.cpp
     src/api_contract.cpp
     src/determinism_guards.cpp
