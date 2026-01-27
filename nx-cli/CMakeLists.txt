@@ -13,6 +13,8 @@ add_executable(nx-cli
     src/serialize/MonitorStatusJsonSerializer.cpp
     src/serialize/MonitorStatusTextSerializer.cpp
     src/error/CliError.cpp
+    src/batch_artifact_loader.cpp
+    src/batch_introspection_command.cpp
 )
 
 target_include_directories(nx-cli PRIVATE src)

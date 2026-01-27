@@ -12,7 +12,12 @@ enum class CliErrorCode {
     NX_CLI_USAGE_ERROR,    // Invalid flags / syntax
     NX_CLI_ENUM_ERROR,     // Unknown enum
     NX_ENGINE_REJECTED,    // Engine validation failure
-    NX_EXEC_FAILED         // Runtime failure
+    NX_EXEC_FAILED,        // Runtime failure
+    // Phase 14A batch introspection errors
+    ERROR_BATCH_NOT_FOUND,     // Unknown batch ID
+    ERROR_JOB_NOT_FOUND,       // Unknown job ID within valid batch
+    ERROR_ARTIFACT_NOT_FOUND,  // Unknown artifact ID
+    ERROR_EXECUTION_INCOMPLETE // Batch execution not yet complete
 };
 
 // Stream Policy Types (Explicit)

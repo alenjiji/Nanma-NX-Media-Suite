@@ -1,5 +1,6 @@
 #include "batch_command.h"
 #include "batch_argument_parser.h"
+#include "batch_introspection_command.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -13,7 +14,8 @@ CliResult BatchCommand::execute(const std::vector<std::string>& args) {
         std::cout << "Operations:\\n";
         std::cout << "  run         Execute batch file sequentially\\n";
         std::cout << "  validate    Validate batch file without execution\\n";
-        std::cout << "  summarize   Static summary of batch file contents\\n\\n";
+        std::cout << "  summarize   Static summary of batch file contents\\n";
+        std::cout << "  inspect     Read-only batch introspection (Phase 14A)\\n\\n";
         std::cout << "Use 'nx batch <operation> --help' for operation-specific help\\n";
         return CliResult::ok();
     }
@@ -45,10 +47,14 @@ CliResult BatchCommand::execute(const std::vector<std::string>& args) {
         }
         return handle_summarize(request);
         
+    } else if (operation == "inspect") {
+        // Phase 14A: Route to batch introspection command
+        return BatchIntrospectionCommand::execute(operation_args);
+        
     } else {
         return CliResult::error(
             CliErrorCode::NX_CLI_USAGE_ERROR,
-            "Unknown batch operation: " + operation + ". Available: run, validate, summarize"
+            "Unknown batch operation: " + operation + ". Available: run, validate, summarize, inspect"
         );
     }
 }
