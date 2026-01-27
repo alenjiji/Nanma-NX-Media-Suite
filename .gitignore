@@ -1,9 +1,19 @@
-Documentation/my_space/
+# Build directories
 build/
 nx-core/build/
-.amazonq/
 build-audio/
 build-convert/
 build-video/
 Testing/
+
+# Amazon Q configuration
+.amazonq/
+
+# Workspace directories
+Documentation/workspace/
+
+# Legacy entries (to be cleaned up)
+Documentation/my_space/
+Documentation\workspace\my_space\
+my_space\
 q_mental_model.md
