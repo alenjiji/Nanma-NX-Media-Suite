@@ -7,7 +7,7 @@
 using namespace nx::batch;
 
 void test_execution_state_transitions() {
-    SessionJobId job_id{SessionId{"test-session"}, JobId{"job-001"}};
+    SessionJobId job_id{SessionId{"test-session"}, "job-001", 0};
     
     // Test initial state creation
     auto planned_state = ExecutionJobState::create_planned(job_id);
@@ -24,7 +24,7 @@ void test_execution_state_transitions() {
     assert(!running_state.is_terminal());
     
     // Test Running → Completed transition
-    JobExecutionResult success_result{job_id, true, "Success"};
+    JobExecutionResult success_result{true, "Success", "token"};
     auto completed_state = running_state.transition_to_completed(success_result);
     assert(completed_state.job_id == job_id);
     assert(completed_state.current_state == ExecutionState::Completed);
@@ -32,7 +32,7 @@ void test_execution_state_transitions() {
     assert(completed_state.is_terminal());
     
     // Test Running → Failed transition
-    JobExecutionResult failure_result{job_id, false, "Failed"};
+    JobExecutionResult failure_result{false, "Failed", "token"};
     auto failed_state = running_state.transition_to_failed(failure_result);
     assert(failed_state.job_id == job_id);
     assert(failed_state.current_state == ExecutionState::Failed);
@@ -41,8 +41,8 @@ void test_execution_state_transitions() {
 }
 
 void test_invalid_state_transitions() {
-    SessionJobId job_id{SessionId{"test-session"}, JobId{"job-001"}};
-    JobExecutionResult result{job_id, true, "Result"};
+    SessionJobId job_id{SessionId{"test-session"}, "job-001", 0};
+    JobExecutionResult result{true, "Result", "token"};
     
     auto planned_state = ExecutionJobState::create_planned(job_id);
     auto running_state = planned_state.transition_to_running();
@@ -116,7 +116,7 @@ void test_execution_state_store() {
     assert(running_counts.failed_count == 0);
     
     // Complete first job
-    JobExecutionResult result{job1_id, true, "Success"};
+    JobExecutionResult result{true, "Success", "token"};
     auto job1_completed = state_store.get_job_state(job1_id).transition_to_completed(result);
     state_store.update_job_state(job1_completed);
     
@@ -124,7 +124,7 @@ void test_execution_state_store() {
     auto job2_running = state_store.get_job_state(job2_id).transition_to_running();
     state_store.update_job_state(job2_running);
     
-    JobExecutionResult failure_result{job2_id, false, "Failed"};
+    JobExecutionResult failure_result{false, "Failed", "token"};
     auto job2_failed = state_store.get_job_state(job2_id).transition_to_failed(failure_result);
     state_store.update_job_state(job2_failed);
     
@@ -172,7 +172,7 @@ void test_execution_state_snapshot() {
 }
 
 void test_state_transition_events() {
-    SessionJobId job_id{SessionId{"test-session"}, JobId{"job-001"}};
+    SessionJobId job_id{SessionId{"test-session"}, "job-001", 0};
     
     StateTransitionEvent event{
         .job_id = job_id,
