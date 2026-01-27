@@ -102,35 +102,42 @@ Real-time telemetry and observability engine.
 
 Nanma NX-MediaSuite follows a strict phased development approach with immutable architectural contracts. See [Documentation/Roadmap.md](Documentation/Roadmap.md) for the complete implementation roadmap.
 
-### Current Status: v1 Production-Ready (Phase 9 Complete)
+### Current Status: Phase 11 Complete - Execution Policies & Phase 12 In Progress
 
 - **Phase Group A (Foundation)**: ✅ Complete & Locked - CLI, parsing, error handling
 - **Phase Group B (Observability)**: ✅ Complete & Locked - Monitor engine for system visibility
 - **Phase Group C (Orchestration)**: ✅ Complete & Locked - BatchEngine for deterministic batch planning
 - **Phase Group E (Execution)**: ✅ Complete & Locked - Synchronous job execution and lifecycle management
-- **Phase Group F (Scale & Hardening)**: 🔄 Future - Performance and persistence (optional)
+- **Phase 10 (Deterministic Retries)**: ✅ Complete & Locked - Retry engine, execution persistence, and replay verification
+- **Phase 11 (Execution Policies)**: ✅ Complete & Locked - Pure data model for execution constraints
+- **Phase 12 (Policy Interpretation)**: ⏳ Current - Read-only policy interpretation engine
+- **Phase 13-16 (Adapters & UI)**: 🔄 Future - CLI adapters, Python bindings, Qt UI, and project closure
 
 ### Architecture Maturity
 
-The system is now **v1 Production-Ready** with:
+The system has achieved **Phase 11 Complete** with:
 - Complete CLI interface with deterministic parsing
 - Real-time system monitoring and engine discovery
 - Deterministic batch job planning with stable job IDs
 - Full job execution engine with state management
 - Complete job lifecycle with deterministic state transitions
+- Deterministic retry engine with lineage tracking
+- Execution persistence for forensic replay
+- Replay verification harness for determinism validation
+- Complete execution policy data model (Phase 11.1-11.3)
 
-**v1 Milestone Achieved**: All core functionality complete through Phase 9.
+**Phase 11 Milestone Achieved**: Immutable policy framework with interpretation engine in progress.
 
 ## Documentation
 
-- [Development Roadmap](Documentation/Roadmap.md) - Official phased development plan and architectural contracts
-- [Architectural Principles](Documentation/architectural_principles.md) - Core design philosophy and constraints
-- [NX-Convert Pro Design](Documentation/nx_convert_pro_design.md) - Lossless transcoding engine
-- [NX-AudioLab Design](Documentation/nx_audiolab_design.md) - Professional audio processing
-- [NX-VideoTrans Design](Documentation/nx_videotrans_design.md) - Video encoding suite
-- [NX-MetaFix Design](Documentation/nx_metafix_design.md) - Metadata and container repair
-- [NX-BatchFlow Design](Documentation/nx_batchflow_design.md) - Batch processing automation
-- [NX-Monitor Design](Documentation/nx_monitor_design.md) - Telemetry and observability
+- [Development Roadmap](Documentation/planning/Roadmap V1.md) - Final phased development plan and architectural contracts
+- [Architectural Principles](Documentation/architecture/principles/architectural_principles.md) - Core design philosophy and constraints
+- [NX-Convert Pro Design](Documentation/specifications/components/nx_convert_pro_design.md) - Lossless transcoding engine
+- [NX-AudioLab Design](Documentation/specifications/components/nx_audiolab_design.md) - Professional audio processing
+- [NX-VideoTrans Design](Documentation/specifications/components/nx_videotrans_design.md) - Video encoding suite
+- [NX-MetaFix Design](Documentation/specifications/components/nx_metafix_design.md) - Metadata and container repair
+- [NX-BatchFlow Design](Documentation/specifications/components/nx_batchflow_design.md) - Batch processing automation
+- [NX-Monitor Design](Documentation/specifications/components/nx_monitor_design.md) - Telemetry and observability
 
 ## Professional Guarantees
 
