@@ -1,10 +1,12 @@
 name: Semantic Versioning and Tagging
 
+# TEMPORARILY DISABLED - Linux CI stabilization in progress
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  workflow_dispatch:  # Manual trigger only
+  # push:
+  #   branches: [ main, master ]
+  # pull_request:
+  #   branches: [ main, master ]
 
 permissions:
   contents: write
