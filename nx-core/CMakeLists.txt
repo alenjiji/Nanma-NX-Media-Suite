@@ -13,9 +13,21 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# NX-Core library target (INTERFACE-only)
-add_library(nx-core INTERFACE)
-target_include_directories(nx-core INTERFACE
+# NX-Core library target
+set(NX_CORE_SOURCES
+    src/nx_core.cpp
+    src/nx_identity.cpp
+    src/identity.cpp
+    src/logical_clock.cpp
+    src/error_system.cpp
+    src/result.cpp
+    src/api_contract.cpp
+    src/determinism_guards.cpp
+    src/deterministic_numeric_policy.cpp
+)
+
+add_library(nx-core ${NX_CORE_SOURCES})
+target_include_directories(nx-core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
