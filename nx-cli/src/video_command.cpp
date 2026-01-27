@@ -5,15 +5,15 @@
 
 namespace nx::cli {
 
-static nx::video::VideoRequest translate_to_video_engine_request(const VideoAnalyzeRequest& cli_request) {
+static nx::video::VideoRequest translate_to_video_engine_request(const VideoAnalyzeRequest& /* cli_request */) {
     return nx::video::VideoRequest{};
 }
 
-static nx::video::VideoRequest translate_to_video_engine_request(const VideoProcessRequest& cli_request) {
+static nx::video::VideoRequest translate_to_video_engine_request(const VideoProcessRequest& /* cli_request */) {
     return nx::video::VideoRequest{};
 }
 
-static nx::video::VideoRequest translate_to_video_engine_request(const VideoVerifyRequest& cli_request) {
+static nx::video::VideoRequest translate_to_video_engine_request(const VideoVerifyRequest& /* cli_request */) {
     return nx::video::VideoRequest{};
 }
 
