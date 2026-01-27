@@ -106,11 +106,11 @@ public:
                                          const std::string& artifact_id, 
                                          std::string& content);
 
-private:
     // Utility functions for deterministic ordering
     static void sort_jobs_by_execution_order(std::vector<std::string>& job_ids, 
                                             const std::map<std::string, size_t>& execution_order);
-    
+
+private:
     static void sort_artifacts_by_id(std::vector<ArtifactMetadata>& artifacts);
     
     // Artifact path resolution (based on existing conventions)
