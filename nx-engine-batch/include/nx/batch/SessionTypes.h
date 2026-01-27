@@ -105,3 +105,16 @@ struct RuntimeSessionJob {
 };
 
 } // namespace nx::batch
+
+// Hash specialization for SessionJobId to enable unordered_map usage
+namespace std {
+    template<>
+    struct hash<nx::batch::SessionJobId> {
+        size_t operator()(const nx::batch::SessionJobId& job_id) const noexcept {
+            size_t h1 = hash<string>{}(job_id.session.value);
+            size_t h2 = hash<string>{}(job_id.job_value);
+            size_t h3 = hash<uint32_t>{}(job_id.attempt_index);
+            return h1 ^ (h2 << 1) ^ (h3 << 2);
+        }
+    };
+}
