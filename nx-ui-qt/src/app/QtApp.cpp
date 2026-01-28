@@ -1,6 +1,7 @@
 #include "QtApp.h"
 #include "adapters/QtCliAdapter.h"
 #include "ui/OutputView.h"
+#include "commands/CommandDescriptor.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -50,7 +51,7 @@ QtApp::QtApp(QWidget *parent)
 
 void QtApp::onRunVersion()
 {
-    std::vector<std::string> args = {"nx", "--version"};
+    auto args = getCommandArgs(CommandId::Version);
     auto result = m_adapter.run(args);
     
     QString output = QString::fromStdString(result.stdout_text) +
@@ -62,7 +63,7 @@ void QtApp::onRunVersion()
 
 void QtApp::onShowHelp()
 {
-    std::vector<std::string> args = {"nx", "--help"};
+    auto args = getCommandArgs(CommandId::Help);
     auto result = m_adapter.run(args);
     
     QString output = QString::fromStdString(result.stdout_text) +
