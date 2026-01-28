@@ -116,15 +116,6 @@ QString QtApp::getGroupName(CommandGroup group) {
     return "Unknown";
 }
 
-void QtApp::onRunCommand() {
-    // Execution logic deferred to Phase 16.5 - Command Invocation Binding
-}
-
-std::vector<std::string> QtApp::getArgsForCommand(nx::cli::CommandId commandId) {
-    // Command argument mapping deferred to Phase 16.5
-    return {};
-}
-
 void QtApp::onRunVersion()
 {
     auto command = getCommand(CommandId::Version);
