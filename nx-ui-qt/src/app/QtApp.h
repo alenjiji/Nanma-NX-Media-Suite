@@ -5,6 +5,8 @@
 #include <QGroupBox>
 #include <QLabel>
 #include "../adapters/QtCliAdapter.h"
+#include "../commands/CommandGroup.h"
+#include "../../nx-cli/src/CommandId.h"
 
 class OutputView;
 
@@ -18,8 +20,12 @@ public:
 private slots:
     void onRunVersion();
     void onShowHelp();
+    void onRunCommand();
 
 private:
+    QString getGroupName(CommandGroup group);
+    std::vector<std::string> getArgsForCommand(nx::cli::CommandId commandId);
+    
     QPushButton* m_versionButton;
     QPushButton* m_helpButton;
     OutputView* m_outputView;
