@@ -37,9 +37,8 @@ QtApp::QtApp(QWidget *parent)
     QGroupBox* outputGroup = new QGroupBox("Output", this);
     QVBoxLayout* outputLayout = new QVBoxLayout(outputGroup);
     
-    m_outputText = new QPlainTextEdit(this);
-    m_outputText->setReadOnly(true);
-    outputLayout->addWidget(m_outputText);
+    m_outputView = new OutputView(this);
+    outputLayout->addWidget(m_outputView);
     
     mainLayout->addWidget(outputGroup);
     
@@ -56,7 +55,7 @@ void QtApp::onRunVersion()
                     QString::fromStdString(result.stderr_text) +
                     QString::number(result.exit_code) + "\n";
     
-    m_outputText->setPlainText(output);
+    m_outputView->setOutput(output);
 }
 
 void QtApp::onShowHelp()
@@ -68,5 +67,5 @@ void QtApp::onShowHelp()
                     QString::fromStdString(result.stderr_text) +
                     QString::number(result.exit_code) + "\n";
     
-    m_outputText->setPlainText(output);
+    m_outputView->setOutput(output);
 }

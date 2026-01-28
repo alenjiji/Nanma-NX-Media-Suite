@@ -18,6 +18,8 @@ if(BUILD_UI_QT)
         src/app/QtApp.h
         src/adapters/QtCliAdapter.cpp
         src/adapters/QtCliAdapter.h
+        src/ui/OutputView.cpp
+        src/ui/OutputView.h
     )
     
     target_link_libraries(nx-ui-qt

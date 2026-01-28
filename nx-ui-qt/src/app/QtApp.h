@@ -2,10 +2,10 @@
 
 #include <QMainWindow>
 #include <QPushButton>
-#include <QPlainTextEdit>
 #include <QGroupBox>
 #include <QLabel>
 #include "adapters/QtCliAdapter.h"
+#include "ui/OutputView.h"
 
 class QtApp : public QMainWindow
 {
@@ -21,6 +21,6 @@ private slots:
 private:
     QPushButton* m_versionButton;
     QPushButton* m_helpButton;
-    QPlainTextEdit* m_outputText;
+    OutputView* m_outputView;
     QtCliAdapter m_adapter;
 };
