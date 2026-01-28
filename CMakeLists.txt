@@ -8,6 +8,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Enable testing at root level
 enable_testing()
 
+# Qt UI module option
+option(BUILD_UI_QT "Build Qt UI module" OFF)
+
 add_subdirectory(nx-core)
 add_subdirectory(nx-engine-convert)
 add_subdirectory(nx-engine-audio)
@@ -16,3 +19,7 @@ add_subdirectory(nx-engine-meta)
 add_subdirectory(nx-engine-monitor)
 add_subdirectory(nx-engine-batch)
 add_subdirectory(nx-cli)
+
+if(BUILD_UI_QT)
+    add_subdirectory(nx-ui-qt)
+endif()
