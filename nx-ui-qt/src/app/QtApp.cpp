@@ -1,5 +1,8 @@
 #include "QtApp.h"
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QGroupBox>
+#include <QLabel>
 #include <QWidget>
 
 QtApp::QtApp(QWidget *parent)
@@ -11,14 +14,31 @@ QtApp::QtApp(QWidget *parent)
     QWidget* centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
     
-    QVBoxLayout* layout = new QVBoxLayout(centralWidget);
+    QVBoxLayout* mainLayout = new QVBoxLayout(centralWidget);
+    
+    // Header Area
+    QLabel* headerLabel = new QLabel("Nanma NX-MediaSuite", this);
+    headerLabel->setStyleSheet("font-size: 16px; font-weight: bold; padding: 10px;");
+    mainLayout->addWidget(headerLabel);
+    
+    // Actions Panel
+    QGroupBox* actionsGroup = new QGroupBox("Actions", this);
+    QVBoxLayout* actionsLayout = new QVBoxLayout(actionsGroup);
     
     m_runButton = new QPushButton("Run CLI Test", this);
+    actionsLayout->addWidget(m_runButton);
+    
+    mainLayout->addWidget(actionsGroup);
+    
+    // Output Panel
+    QGroupBox* outputGroup = new QGroupBox("Output", this);
+    QVBoxLayout* outputLayout = new QVBoxLayout(outputGroup);
+    
     m_outputText = new QPlainTextEdit(this);
     m_outputText->setReadOnly(true);
+    outputLayout->addWidget(m_outputText);
     
-    layout->addWidget(m_runButton);
-    layout->addWidget(m_outputText);
+    mainLayout->addWidget(outputGroup);
     
     connect(m_runButton, &QPushButton::clicked, this, &QtApp::onRunCliTest);
 }

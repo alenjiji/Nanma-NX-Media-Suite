@@ -3,6 +3,8 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QPlainTextEdit>
+#include <QGroupBox>
+#include <QLabel>
 #include "adapters/QtCliAdapter.h"
 
 class QtApp : public QMainWindow
