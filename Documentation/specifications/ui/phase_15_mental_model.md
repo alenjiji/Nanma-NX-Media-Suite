@@ -1,4 +1,8 @@
-# Phase 15 Mental Model — Qt UI Development Proceedings
+# Phase 15 — Mental Model (Qt UI Development Proceedings)
+
+Status: FROZEN (Phase 15 Architectural Contract)
+Scope: Phase 15 Development Guidance
+Authority: CLI Canonical Contract
 
 **Status:** Phase 15.1 Complete & Frozen → Phase 15.2 Ready
 **Architecture:** Terminal Consumer Pattern (CLI Authority Preserved)

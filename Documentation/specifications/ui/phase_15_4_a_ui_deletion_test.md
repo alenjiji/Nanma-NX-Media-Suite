@@ -1,3 +1,9 @@
+# Phase 15.4-A — UI Deletion Test (Replaceability Proof)
+
+Status: FROZEN (Phase 15 Architectural Contract)
+Scope: UI Replaceability Verification
+Authority: CLI Canonical Contract
+
 # UI Deletion Test (Replaceability Proof)
 
 ## 1. Test Scenario Definition

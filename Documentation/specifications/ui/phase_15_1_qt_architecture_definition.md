@@ -1,5 +1,9 @@
 # Phase 15.1 — Qt UI Architecture & Invariants
 
+Status: FROZEN (Phase 15 Architectural Contract)
+Scope: Qt UI Architecture Definition
+Authority: CLI Canonical Contract
+
 **Status:** Architectural Definition Complete
 **Implementation Status:** Not Started (Architecture-First Approach)
 **Next Phase:** Phase 15.2 (UI Adapter Implementation)
