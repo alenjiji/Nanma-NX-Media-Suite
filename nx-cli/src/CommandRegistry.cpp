@@ -1,5 +1,10 @@
 #include "CommandRegistry.h"
 
+// Compile-time guard: CommandGroup must never be used in execution paths
+#ifdef COMMANDGROUP_H
+#error "CommandGroup header detected in CLI execution path - presentation layer leaked into execution"
+#endif
+
 namespace nx::cli {
 
 CommandId CommandRegistry::parse(const std::vector<std::string>& args) {

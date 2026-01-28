@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef COMMANDGROUP_H
+#define COMMANDGROUP_H
+
 enum class CommandGroup {
     CoreOperations,
     AudioProcessing,
@@ -10,3 +13,5 @@ enum class CommandGroup {
     SystemAndInfrastructure,
     HelpAndInformation
 };
+
+#endif // COMMANDGROUP_H

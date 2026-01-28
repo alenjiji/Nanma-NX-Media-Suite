@@ -22,6 +22,10 @@ if(BUILD_UI_QT)
         src/ui/OutputView.h
         src/commands/CommandDescriptor.cpp
         src/commands/CommandDescriptor.h
+        src/commands/CommandGroup.h
+        src/commands/CommandPresentationMetadata.h
+        src/commands/CommandPresentationRegistry.cpp
+        src/commands/CommandPresentationRegistry.h
     )
     
     target_link_libraries(nx-ui-qt

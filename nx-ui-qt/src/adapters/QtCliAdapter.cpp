@@ -1,6 +1,6 @@
 #include "QtCliAdapter.h"
 #include "../commands/CommandDescriptor.h"
-#include "cli_execution.h"
+#include "../../../nx-cli/include/cli_execution.h"
 #include <vector>
 #include <string>
 

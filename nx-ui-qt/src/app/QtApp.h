@@ -4,8 +4,8 @@
 #include <QPushButton>
 #include <QGroupBox>
 #include <QLabel>
+#include "../adapters/QtCliAdapter.h"
 
-class QtCliAdapter;
 class OutputView;
 
 class QtApp : public QMainWindow
