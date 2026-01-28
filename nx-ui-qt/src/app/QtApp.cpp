@@ -1,4 +1,6 @@
 #include "QtApp.h"
+#include "adapters/QtCliAdapter.h"
+#include "ui/OutputView.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>

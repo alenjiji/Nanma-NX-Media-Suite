@@ -20,6 +20,8 @@ if(BUILD_UI_QT)
         src/adapters/QtCliAdapter.h
         src/ui/OutputView.cpp
         src/ui/OutputView.h
+        src/commands/CommandDescriptor.cpp
+        src/commands/CommandDescriptor.h
     )
     
     target_link_libraries(nx-ui-qt
@@ -28,7 +30,12 @@ if(BUILD_UI_QT)
         nx-cli-lib
     )
     
-    target_include_directories(nx-ui-qt PRIVATE src)
+    target_include_directories(nx-ui-qt PRIVATE 
+        src
+        src/adapters
+        src/ui
+        src/commands
+    )
     
 else()
     message(STATUS "Qt UI module disabled (BUILD_UI_QT=OFF)")
