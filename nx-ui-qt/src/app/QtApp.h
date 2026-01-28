@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QPushButton>
+#include <QPlainTextEdit>
+#include "adapters/QtCliAdapter.h"
 
 class QtApp : public QMainWindow
 {
@@ -8,4 +11,12 @@ class QtApp : public QMainWindow
 
 public:
     QtApp(QWidget *parent = nullptr);
+
+private slots:
+    void onRunCliTest();
+
+private:
+    QPushButton* m_runButton;
+    QPlainTextEdit* m_outputText;
+    QtCliAdapter m_adapter;
 };
