@@ -28,3 +28,30 @@ CliResult QtCliAdapter::run(const Command& command)
     auto args = resolveCommandArgs(command.getId());
     return run(args);
 }
+
+CliResult QtCliAdapter::runCommand(nx::cli::CommandId command_id)
+{
+    auto args = getArgsForCommand(command_id);
+    return run(args);
+}
+
+std::vector<std::string> QtCliAdapter::getArgsForCommand(nx::cli::CommandId command_id)
+{
+    switch (command_id) {
+        case nx::cli::CommandId::MonitorStatus:
+            return {"monitor", "status"};
+        case nx::cli::CommandId::MonitorJobs:
+            return {"monitor", "jobs"};
+        case nx::cli::CommandId::MonitorJob:
+            return {"monitor", "job", "example_id"};
+        case nx::cli::CommandId::BatchStatus:
+            return {"batch", "status"};
+        case nx::cli::CommandId::BatchSession:
+            return {"batch", "session", "example_id"};
+        case nx::cli::CommandId::BatchJobs:
+            return {"batch", "jobs", "example_id"};
+        case nx::cli::CommandId::Invalid:
+        default:
+            return {};
+    }
+}

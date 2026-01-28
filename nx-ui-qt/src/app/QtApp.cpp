@@ -10,6 +10,11 @@
 #include <QWidget>
 #include <QPushButton>
 
+// Compile-time guard: QtApp must never construct CLI arguments
+#ifdef CLI_EXECUTION_H
+#error "CLI execution header detected in QtApp - UI layer must not construct CLI arguments"
+#endif
+
 QtApp::QtApp(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -69,7 +74,7 @@ QtApp::QtApp(QWidget *parent)
                 "    background-color: #d5d5d5; "
                 "}"
             );
-            // Execution wiring deferred to Phase 16.5
+            connect(button, &QPushButton::clicked, this, &QtApp::onRunCommand);
             groupLayout->addWidget(button);
         }
         
@@ -114,6 +119,26 @@ QString QtApp::getGroupName(CommandGroup group) {
         case CommandGroup::HelpAndInformation: return "Help & Information";
     }
     return "Unknown";
+}
+
+void QtApp::onRunCommand() {
+    // Architecture guard: UI must only dispatch CommandId, never construct CLI args
+    static_assert(sizeof(nx::cli::CommandId) > 0, "CommandId must be opaque to UI layer");
+    
+    QPushButton* button = qobject_cast<QPushButton*>(sender());
+    if (!button) return;
+    
+    int commandIdInt = button->property("command_id").toInt();
+    nx::cli::CommandId commandId = static_cast<nx::cli::CommandId>(commandIdInt);
+    
+    // All CLI execution must route through adapter - no direct CLI calls allowed
+    auto result = m_adapter.runCommand(commandId);
+    
+    QString output = QString::fromStdString(result.stdout_text) +
+                    QString::fromStdString(result.stderr_text) +
+                    "Exit code: " + QString::number(result.exit_code) + "\n";
+    
+    m_outputView->setOutput(output);
 }
 
 void QtApp::onRunVersion()

@@ -20,6 +20,7 @@ public:
 private slots:
     void onRunVersion();
     void onShowHelp();
+    void onRunCommand();
 
 private:
     QString getGroupName(CommandGroup group);

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "../../nx-cli/src/CommandId.h"
 
 class Command;
 
@@ -18,4 +19,8 @@ public:
     
     CliResult run(const std::vector<std::string>& args);
     CliResult run(const Command& command);
+    CliResult runCommand(nx::cli::CommandId command_id);
+    
+private:
+    std::vector<std::string> getArgsForCommand(nx::cli::CommandId command_id);
 };
