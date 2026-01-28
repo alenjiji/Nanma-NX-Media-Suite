@@ -1,11 +1,17 @@
 #pragma once
 
-#include <vector>
-#include <string>
-
 enum class CommandId {
     Version,
     Help
 };
 
-std::vector<std::string> getCommandArgs(CommandId id);
+class Command {
+public:
+    explicit Command(CommandId id);
+    CommandId getId() const;
+    
+private:
+    CommandId m_id;
+};
+
+Command getCommand(CommandId id);

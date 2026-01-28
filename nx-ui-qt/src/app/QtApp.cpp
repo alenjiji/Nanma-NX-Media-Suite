@@ -51,8 +51,8 @@ QtApp::QtApp(QWidget *parent)
 
 void QtApp::onRunVersion()
 {
-    auto args = getCommandArgs(CommandId::Version);
-    auto result = m_adapter.run(args);
+    auto command = getCommand(CommandId::Version);
+    auto result = m_adapter.run(command);
     
     QString output = QString::fromStdString(result.stdout_text) +
                     QString::fromStdString(result.stderr_text) +
@@ -63,8 +63,8 @@ void QtApp::onRunVersion()
 
 void QtApp::onShowHelp()
 {
-    auto args = getCommandArgs(CommandId::Help);
-    auto result = m_adapter.run(args);
+    auto command = getCommand(CommandId::Help);
+    auto result = m_adapter.run(command);
     
     QString output = QString::fromStdString(result.stdout_text) +
                     QString::fromStdString(result.stderr_text) +
