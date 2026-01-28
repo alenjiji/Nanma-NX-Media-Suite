@@ -6,6 +6,12 @@ build-convert/
 build-video/
 Testing/
 
+# Python compiled artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
 # Amazon Q configuration
 .amazonq/
 

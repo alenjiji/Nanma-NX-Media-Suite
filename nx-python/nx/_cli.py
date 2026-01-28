@@ -6,6 +6,7 @@ Implements exec-based subprocess strategy.
 import subprocess
 import json
 from typing import List, Dict, Any
+from ._cli_resolver import find_nx_cli_executable
 
 
 class CLIError(Exception):
@@ -36,8 +37,11 @@ def invoke_cli(args: List[str]) -> Dict[str, Any]:
         CLIError: CLI returned non-zero exit code
         CLIOutputError: CLI output was not valid JSON
     """
+    # Resolve CLI executable path
+    cli_path = find_nx_cli_executable()
+    
     # Force JSON output for all commands
-    cmd = ['nx'] + args + ['--format', 'json']
+    cmd = [cli_path] + args + ['--format', 'json']
     
     result = subprocess.run(
         cmd,
@@ -68,7 +72,10 @@ def invoke_cli_raw(args: List[str]) -> str:
     Raises:
         CLIError: CLI returned non-zero exit code
     """
-    cmd = ['nx'] + args
+    # Resolve CLI executable path
+    cli_path = find_nx_cli_executable()
+    
+    cmd = [cli_path] + args
     
     result = subprocess.run(
         cmd,
