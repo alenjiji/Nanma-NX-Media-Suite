@@ -15,10 +15,12 @@ public:
     QtApp(QWidget *parent = nullptr);
 
 private slots:
-    void onRunCliTest();
+    void onRunVersion();
+    void onShowHelp();
 
 private:
-    QPushButton* m_runButton;
+    QPushButton* m_versionButton;
+    QPushButton* m_helpButton;
     QPlainTextEdit* m_outputText;
     QtCliAdapter m_adapter;
 };

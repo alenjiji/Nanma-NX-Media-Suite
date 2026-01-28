@@ -25,8 +25,11 @@ QtApp::QtApp(QWidget *parent)
     QGroupBox* actionsGroup = new QGroupBox("Actions", this);
     QVBoxLayout* actionsLayout = new QVBoxLayout(actionsGroup);
     
-    m_runButton = new QPushButton("Run CLI Test", this);
-    actionsLayout->addWidget(m_runButton);
+    m_versionButton = new QPushButton("Run Version", this);
+    m_helpButton = new QPushButton("Show Help", this);
+    
+    actionsLayout->addWidget(m_versionButton);
+    actionsLayout->addWidget(m_helpButton);
     
     mainLayout->addWidget(actionsGroup);
     
@@ -40,12 +43,25 @@ QtApp::QtApp(QWidget *parent)
     
     mainLayout->addWidget(outputGroup);
     
-    connect(m_runButton, &QPushButton::clicked, this, &QtApp::onRunCliTest);
+    connect(m_versionButton, &QPushButton::clicked, this, &QtApp::onRunVersion);
+    connect(m_helpButton, &QPushButton::clicked, this, &QtApp::onShowHelp);
 }
 
-void QtApp::onRunCliTest()
+void QtApp::onRunVersion()
 {
     std::vector<std::string> args = {"nx", "--version"};
+    auto result = m_adapter.run(args);
+    
+    QString output = QString::fromStdString(result.stdout_text) +
+                    QString::fromStdString(result.stderr_text) +
+                    QString::number(result.exit_code) + "\n";
+    
+    m_outputText->setPlainText(output);
+}
+
+void QtApp::onShowHelp()
+{
+    std::vector<std::string> args = {"nx", "--help"};
     auto result = m_adapter.run(args);
     
     QString output = QString::fromStdString(result.stdout_text) +
