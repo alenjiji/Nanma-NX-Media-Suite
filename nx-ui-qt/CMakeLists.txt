@@ -17,11 +17,14 @@ if(BUILD_UI_QT)
             src/main.cpp
             src/app/QtApp.cpp
             src/app/QtApp.h
+            src/adapters/QtCliAdapter.cpp
+            src/adapters/QtCliAdapter.h
         )
         
         target_link_libraries(nx-ui-qt
             Qt6::Core
             Qt6::Widgets
+            nx-cli-lib
         )
         
         target_include_directories(nx-ui-qt PRIVATE src)

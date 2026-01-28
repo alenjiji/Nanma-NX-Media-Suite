@@ -23,6 +23,7 @@ add_library(nx-cli-lib
     src/monitor_argument_parser.cpp
     src/monitor_command.cpp
     src/video_argument_parser.cpp
+    src/cli_execution.cpp
 )
 
 target_include_directories(nx-cli-lib PUBLIC include)

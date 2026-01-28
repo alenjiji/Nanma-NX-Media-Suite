@@ -1,6 +1,8 @@
 #include "CliApp.h"
+#include "cli_execution.h"
 #include <vector>
 #include <string>
+#include <iostream>
 
 int main(int argc, char* argv[]) {
     std::vector<std::string> args;
@@ -10,6 +12,11 @@ int main(int argc, char* argv[]) {
         args.emplace_back(argv[i]);
     }
     
-    nx::cli::CliApp app;
-    return app.run(args);
+    auto result = nx::cli::execute_command(args);
+    
+    // Write captured output
+    std::cout << result.stdout_text;
+    std::cerr << result.stderr_text;
+    
+    return result.exit_code;
 }
