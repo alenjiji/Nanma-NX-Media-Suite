@@ -31,4 +31,4 @@ def status(format: Literal["json", "text"] = "json") -> Dict[str, Any]:
         return {"raw_output": invoke_cli_raw(["monitor", "status", "--text"])}
     
     # JSON format - use structured invocation
-    return invoke_cli(["monitor", "status"])
+    return invoke_cli(["monitor", "status", "--json"])

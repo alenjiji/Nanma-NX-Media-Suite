@@ -41,10 +41,7 @@ def plan(
         raise ValueError("Cannot specify both jobs_only and dag_only")
     
     # Build CLI arguments
-    args = ["batch", "inspect", "plan", batch_id]
-    
-    if format != "json":  # json is CLI default
-        args.extend(["--format", format])
+    args = ["batch", "inspect", "plan", batch_id, "--format", format]
     
     if jobs_only:
         args.append("--jobs-only")
@@ -89,10 +86,7 @@ def jobs(
     if sort not in ("execution", "dependency", "id"):
         raise ValueError(f"Invalid sort: {sort}")
     
-    args = ["batch", "inspect", "jobs", batch_id]
-    
-    if format != "json":
-        args.extend(["--format", format])
+    args = ["batch", "inspect", "jobs", batch_id, "--format", format]
     
     if filter_type:
         args.extend(["--filter-type", filter_type])

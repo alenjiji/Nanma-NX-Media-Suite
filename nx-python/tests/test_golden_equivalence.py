@@ -96,7 +96,7 @@ class TestMonitorCommands(GoldenEquivalenceTest):
         python_result = nx.monitor.status()
         
         # Assert golden equivalence
-        self._assert_golden_equivalence(["monitor", "status"], python_result)
+        self._assert_golden_equivalence(["monitor", "status", "--json"], python_result)
 
 
 class TestBatchIntrospectionCommands(GoldenEquivalenceTest):
@@ -118,7 +118,7 @@ class TestBatchIntrospectionCommands(GoldenEquivalenceTest):
         
         # Assert golden equivalence
         self._assert_golden_equivalence(
-            ["batch", "inspect", "plan", str(plan_file)], 
+            ["batch", "inspect", "plan", str(plan_file), "--format", "json"], 
             python_result
         )
 

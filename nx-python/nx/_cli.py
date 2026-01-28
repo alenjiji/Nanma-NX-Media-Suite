@@ -40,8 +40,8 @@ def invoke_cli(args: List[str]) -> Dict[str, Any]:
     # Resolve CLI executable path
     cli_path = find_nx_cli_executable()
     
-    # Force JSON output for all commands
-    cmd = [cli_path] + args + ['--format', 'json']
+    # Use exact arguments - no global flag injection
+    cmd = [cli_path] + args
     
     result = subprocess.run(
         cmd,
