@@ -4,6 +4,8 @@
 #include <QPushButton>
 #include <QGroupBox>
 #include <QLabel>
+#include <QWidget>
+#include <QMap>
 #include "../adapters/QtCliAdapter.h"
 #include "../commands/CommandGroup.h"
 #include "../../nx-cli/src/CommandId.h"
@@ -21,6 +23,7 @@ private slots:
     void onRunVersion();
     void onShowHelp();
     void onRunCommand();
+    void onToggleGroup();
 
 private:
     QString getGroupName(CommandGroup group);
@@ -29,4 +32,6 @@ private:
     QPushButton* m_helpButton;
     OutputView* m_outputView;
     QtCliAdapter m_adapter;
+    QMap<CommandGroup, QWidget*> m_groupContents;
+    QMap<CommandGroup, bool> m_groupExpanded;
 };

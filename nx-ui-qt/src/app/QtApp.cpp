@@ -35,25 +35,51 @@ QtApp::QtApp(QWidget *parent)
     auto groupedCommands = CommandPresentationRegistry::getGroupedCommands();
     for (const auto& [group, commands] : groupedCommands) {
         QString groupName = getGroupName(group);
-        QGroupBox* groupBox = new QGroupBox(groupName, this);
-        groupBox->setStyleSheet(
-            "QGroupBox { "
+        
+        // Create collapsible group container
+        QWidget* groupContainer = new QWidget(this);
+        QVBoxLayout* containerLayout = new QVBoxLayout(groupContainer);
+        containerLayout->setContentsMargins(0, 0, 0, 0);
+        containerLayout->setSpacing(0);
+        
+        // Create clickable header
+        QPushButton* headerButton = new QPushButton("▼ " + groupName, this);
+        headerButton->setProperty("group", static_cast<int>(group));
+        headerButton->setCursor(Qt::PointingHandCursor);
+        headerButton->setStyleSheet(
+            "QPushButton { "
+            "    text-align: left; "
             "    font-weight: bold; "
+            "    font-size: 14px; "
             "    border: 2px solid #cccccc; "
             "    border-radius: 5px; "
-            "    margin-top: 10px; "
-            "    padding-top: 10px; "
+            "    padding: 12px 15px; "
+            "    background-color: #f8f8f8; "
+            "    color: #333333; "
             "} "
-            "QGroupBox::title { "
-            "    subcontrol-origin: margin; "
-            "    left: 10px; "
-            "    padding: 0 5px 0 5px; "
+            "QPushButton:hover { "
+            "    background-color: #e8e8e8; "
+            "    border-color: #999999; "
+            "} "
+            "QPushButton:pressed { "
+            "    background-color: #d8d8d8; "
             "}"
         );
+        connect(headerButton, &QPushButton::clicked, this, &QtApp::onToggleGroup);
         
-        QVBoxLayout* groupLayout = new QVBoxLayout(groupBox);
-        groupLayout->setSpacing(8);
-        groupLayout->setContentsMargins(15, 15, 15, 15);
+        // Create content area
+        QWidget* contentWidget = new QWidget(this);
+        contentWidget->setStyleSheet(
+            "QWidget { "
+            "    border: 1px solid #dddddd; "
+            "    border-top: none; "
+            "    border-radius: 0px 0px 5px 5px; "
+            "    background-color: #ffffff; "
+            "}"
+        );
+        QVBoxLayout* contentLayout = new QVBoxLayout(contentWidget);
+        contentLayout->setSpacing(8);
+        contentLayout->setContentsMargins(15, 15, 15, 15);
         
         for (const auto& command : commands) {
             QPushButton* button = new QPushButton(QString::fromStdString(command.short_description), this);
@@ -75,11 +101,18 @@ QtApp::QtApp(QWidget *parent)
                 "}"
             );
             connect(button, &QPushButton::clicked, this, &QtApp::onRunCommand);
-            groupLayout->addWidget(button);
+            contentLayout->addWidget(button);
         }
         
-        mainLayout->addWidget(groupBox);
+        containerLayout->addWidget(headerButton);
+        containerLayout->addWidget(contentWidget);
+        
+        mainLayout->addWidget(groupContainer);
         mainLayout->addSpacing(10);
+        
+        // Store references and set default expanded state
+        m_groupContents[group] = contentWidget;
+        m_groupExpanded[group] = true; // Default: expanded
     }
     
     // Legacy Actions Panel (for Version/Help)
@@ -119,6 +152,32 @@ QString QtApp::getGroupName(CommandGroup group) {
         case CommandGroup::HelpAndInformation: return "Help & Information";
     }
     return "Unknown";
+}
+
+void QtApp::onToggleGroup() {
+    // UI-only presentation guard: Collapsible state has no semantic meaning
+    // This affects only visual display, never command availability or execution
+    
+    QPushButton* headerButton = qobject_cast<QPushButton*>(sender());
+    if (!headerButton) return;
+    
+    int groupInt = headerButton->property("group").toInt();
+    CommandGroup group = static_cast<CommandGroup>(groupInt);
+    
+    // Toggle expanded state
+    bool isExpanded = m_groupExpanded[group];
+    m_groupExpanded[group] = !isExpanded;
+    
+    // Update content visibility
+    QWidget* contentWidget = m_groupContents[group];
+    if (contentWidget) {
+        contentWidget->setVisible(!isExpanded);
+    }
+    
+    // Update header arrow
+    QString groupName = getGroupName(group);
+    QString arrow = !isExpanded ? "▲" : "▼"; // Up arrow when collapsed, down when expanded
+    headerButton->setText(arrow + " " + groupName);
 }
 
 void QtApp::onRunCommand() {
