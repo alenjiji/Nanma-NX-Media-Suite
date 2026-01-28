@@ -1,0 +1,52 @@
+name: Phase 14B Golden Equivalence Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  golden-equivalence:
+    name: Python CLI Golden Equivalence
+    runs-on: [self-hosted, linux]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Configure CMake
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+      
+    - name: Build nx-cli
+      run: cmake --build build --config Release --target nx-cli
+      
+    - name: Verify nx-cli executable
+      run: |
+        if [ ! -f "build/nx-cli/nx-cli" ]; then
+          echo "::error::nx-cli executable not found at expected path"
+          exit 1
+        fi
+        echo "nx-cli found at: $(realpath build/nx-cli/nx-cli)"
+      
+    - name: Run Golden Equivalence Tests
+      run: |
+        cd nx-python/tests
+        echo "Running Phase 14B golden equivalence tests..."
+        python3 run_golden_tests.py -v
+      env:
+        PYTHONPATH: ${{ github.workspace }}/nx-python
+      
+    - name: Validate Phase 14B Contract
+      if: success()
+      run: |
+        echo "::notice::Phase 14B contract validated - CLI and Python bindings are equivalent"
+        echo "::notice::All golden equivalence tests passed or were legitimately skipped"
+      
+    - name: Contract Violation Detected
+      if: failure()
+      run: |
+        echo "::error::Phase 14B contract violation detected"
+        echo "::error::CLI and Python bindings have diverged - merge blocked"
+        echo "::error::Review golden test failures and update Python bindings to match CLI"
+        exit 1
